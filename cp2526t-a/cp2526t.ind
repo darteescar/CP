@@ -1,0 +1,54 @@
+\begin{theindex}
+
+  \item \LaTeX  , \hyperpage{5, 6}
+    \subitem \texttt  {bibtex}, \hyperpage{6}
+    \subitem \texttt  {lhs2TeX}, \hyperpage{5, 6}
+    \subitem \texttt  {makeindex}, \hyperpage{6}
+    \subitem \texttt  {pdflatex}, \hyperpage{5}
+    \subitem \texttt  {xymatrix}, \hyperpage{7}
+
+  \indexspace
+
+  \item Combinador ``pointfree''
+    \subitem \emph  {ana}, \hyperpage{3}
+    \subitem \emph  {cata}
+      \subsubitem Naturais, \hyperpage{7}
+    \subitem \emph  {either}, \hyperpage{3, 4}
+    \subitem \emph  {split}, \hyperpage{6}
+  \item Cálculo de Programas, \hyperpage{1}, \hyperpage{4}
+    \subitem Material Pedagógico, \hyperpage{5}
+      \subsubitem List.hs, \hyperpage{4}
+
+  \indexspace
+
+  \item Docker, \hyperpage{5}
+    \subitem container, \hyperpage{5, 6}
+
+  \indexspace
+
+  \item Functor, \hyperpage{3}, \hyperpage{7, 8}
+  \item Função
+    \subitem $\pi _1$, \hyperpage{7}
+    \subitem $\pi _2$, \hyperpage{7}
+
+  \indexspace
+
+  \item Haskell, \hyperpage{1}, \hyperpage{5, 6}
+    \subitem Biblioteca
+      \subsubitem PFP, \hyperpage{8}
+      \subsubitem Probability, \hyperpage{7, 8}
+    \subitem interpretador
+      \subsubitem GHCi, \hyperpage{5--7}
+    \subitem Lazy evaluation, \hyperpage{3}
+    \subitem Literate Haskell, \hyperpage{5}
+
+  \indexspace
+
+  \item Números naturais ($\mathbb  {N}$), \hyperpage{7}
+
+  \indexspace
+
+  \item Programação
+    \subitem literária, \hyperpage{5, 6}
+
+\end{theindex}

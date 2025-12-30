@@ -1,0 +1,941 @@
+\documentclass[11pt, a4paper, fleqn]{article}
+\usepackage{cp2526t}
+\makeindex
+
+%================= lhs2tex=====================================================%
+%% ODER: format ==         = "\mathrel{==}"
+%% ODER: format /=         = "\neq "
+%
+%
+\makeatletter
+\@ifundefined{lhs2tex.lhs2tex.sty.read}%
+  {\@namedef{lhs2tex.lhs2tex.sty.read}{}%
+   \newcommand\SkipToFmtEnd{}%
+   \newcommand\EndFmtInput{}%
+   \long\def\SkipToFmtEnd#1\EndFmtInput{}%
+  }\SkipToFmtEnd
+
+\newcommand\ReadOnlyOnce[1]{\@ifundefined{#1}{\@namedef{#1}{}}\SkipToFmtEnd}
+\usepackage{amstext}
+\usepackage{amssymb}
+\usepackage{stmaryrd}
+\DeclareFontFamily{OT1}{cmtex}{}
+\DeclareFontShape{OT1}{cmtex}{m}{n}
+  {<5><6><7><8>cmtex8
+   <9>cmtex9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmtex10}{}
+\DeclareFontShape{OT1}{cmtex}{m}{it}
+  {<-> ssub * cmtt/m/it}{}
+\newcommand{\texfamily}{\fontfamily{cmtex}\selectfont}
+\DeclareFontShape{OT1}{cmtt}{bx}{n}
+  {<5><6><7><8>cmtt8
+   <9>cmbtt9
+   <10><10.95><12><14.4><17.28><20.74><24.88>cmbtt10}{}
+\DeclareFontShape{OT1}{cmtex}{bx}{n}
+  {<-> ssub * cmtt/bx/n}{}
+\newcommand{\tex}[1]{\text{\texfamily#1}}	% NEU
+
+\newcommand{\Sp}{\hskip.33334em\relax}
+
+
+\newcommand{\Conid}[1]{\mathit{#1}}
+\newcommand{\Varid}[1]{\mathit{#1}}
+\newcommand{\anonymous}{\kern0.06em \vbox{\hrule\@width.5em}}
+\newcommand{\plus}{\mathbin{+\!\!\!+}}
+\newcommand{\bind}{\mathbin{>\!\!\!>\mkern-6.7mu=}}
+\newcommand{\rbind}{\mathbin{=\mkern-6.7mu<\!\!\!<}}% suggested by Neil Mitchell
+\newcommand{\sequ}{\mathbin{>\!\!\!>}}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+\usepackage{polytable}
+
+%mathindent has to be defined
+\@ifundefined{mathindent}%
+  {\newdimen\mathindent\mathindent\leftmargini}%
+  {}%
+
+\def\resethooks{%
+  \global\let\SaveRestoreHook\empty
+  \global\let\ColumnHook\empty}
+\newcommand*{\savecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\savecolumns[#1]}}
+\newcommand*{\restorecolumns}[1][default]%
+  {\g@addto@macro\SaveRestoreHook{\restorecolumns[#1]}}
+\newcommand*{\aligncolumn}[2]%
+  {\g@addto@macro\ColumnHook{\column{#1}{#2}}}
+
+\resethooks
+
+\newcommand{\onelinecommentchars}{\quad-{}- }
+\newcommand{\commentbeginchars}{\enskip\{-}
+\newcommand{\commentendchars}{-\}\enskip}
+
+\newcommand{\visiblecomments}{%
+  \let\onelinecomment=\onelinecommentchars
+  \let\commentbegin=\commentbeginchars
+  \let\commentend=\commentendchars}
+
+\newcommand{\invisiblecomments}{%
+  \let\onelinecomment=\empty
+  \let\commentbegin=\empty
+  \let\commentend=\empty}
+
+\visiblecomments
+
+\newlength{\blanklineskip}
+\setlength{\blanklineskip}{0.66084ex}
+
+\newcommand{\hsindent}[1]{\quad}% default is fixed indentation
+\let\hspre\empty
+\let\hspost\empty
+\newcommand{\NB}{\textbf{NB}}
+\newcommand{\Todo}[1]{$\langle$\textbf{To do:}~#1$\rangle$}
+
+\EndFmtInput
+\makeatother
+%
+%
+%
+%
+%
+%
+% This package provides two environments suitable to take the place
+% of hscode, called "plainhscode" and "arrayhscode". 
+%
+% The plain environment surrounds each code block by vertical space,
+% and it uses \abovedisplayskip and \belowdisplayskip to get spacing
+% similar to formulas. Note that if these dimensions are changed,
+% the spacing around displayed math formulas changes as well.
+% All code is indented using \leftskip.
+%
+% Changed 19.08.2004 to reflect changes in colorcode. Should work with
+% CodeGroup.sty.
+%
+\ReadOnlyOnce{polycode.fmt}%
+\makeatletter
+
+\newcommand{\hsnewpar}[1]%
+  {{\parskip=0pt\parindent=0pt\par\vskip #1\noindent}}
+
+% can be used, for instance, to redefine the code size, by setting the
+% command to \small or something alike
+\newcommand{\hscodestyle}{}
+
+% The command \sethscode can be used to switch the code formatting
+% behaviour by mapping the hscode environment in the subst directive
+% to a new LaTeX environment.
+
+\newcommand{\sethscode}[1]%
+  {\expandafter\let\expandafter\hscode\csname #1\endcsname
+   \expandafter\let\expandafter\endhscode\csname end#1\endcsname}
+
+% "compatibility" mode restores the non-polycode.fmt layout.
+
+\newenvironment{compathscode}%
+  {\par\noindent
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \let\hspre\(\let\hspost\)%
+   \pboxed}%
+  {\endpboxed\)%
+   \par\noindent
+   \ignorespacesafterend}
+
+\newcommand{\compaths}{\sethscode{compathscode}}
+
+% "plain" mode is the proposed default.
+% It should now work with \centering.
+% This required some changes. The old version
+% is still available for reference as oldplainhscode.
+
+\newenvironment{plainhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\hspre\(\let\hspost\)%
+   \pboxed}%
+  {\endpboxed%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+\newenvironment{oldplainhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \(\pboxed}%
+  {\endpboxed\)%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+% Here, we make plainhscode the default environment.
+
+\newcommand{\plainhs}{\sethscode{plainhscode}}
+\newcommand{\oldplainhs}{\sethscode{oldplainhscode}}
+\plainhs
+
+% The arrayhscode is like plain, but makes use of polytable's
+% parray environment which disallows page breaks in code blocks.
+
+\newenvironment{arrayhscode}%
+  {\hsnewpar\abovedisplayskip
+   \advance\leftskip\mathindent
+   \hscodestyle
+   \let\\=\@normalcr
+   \(\parray}%
+  {\endparray\)%
+   \hsnewpar\belowdisplayskip
+   \ignorespacesafterend}
+
+\newcommand{\arrayhs}{\sethscode{arrayhscode}}
+
+% The mathhscode environment also makes use of polytable's parray 
+% environment. It is supposed to be used only inside math mode 
+% (I used it to typeset the type rules in my thesis).
+
+\newenvironment{mathhscode}%
+  {\parray}{\endparray}
+
+\newcommand{\mathhs}{\sethscode{mathhscode}}
+
+% texths is similar to mathhs, but works in text mode.
+
+\newenvironment{texthscode}%
+  {\(\parray}{\endparray\)}
+
+\newcommand{\texths}{\sethscode{texthscode}}
+
+% The framed environment places code in a framed box.
+
+\def\codeframewidth{\arrayrulewidth}
+\RequirePackage{calc}
+
+\newenvironment{framedhscode}%
+  {\parskip=\abovedisplayskip\par\noindent
+   \hscodestyle
+   \arrayrulewidth=\codeframewidth
+   \tabular{@{}|p{\linewidth-2\arraycolsep-2\arrayrulewidth-2pt}|@{}}%
+   \hline\framedhslinecorrect\\{-1.5ex}%
+   \let\endoflinesave=\\
+   \let\\=\@normalcr
+   \(\pboxed}%
+  {\endpboxed\)%
+   \framedhslinecorrect\endoflinesave{.5ex}\hline
+   \endtabular
+   \parskip=\belowdisplayskip\par\noindent
+   \ignorespacesafterend}
+
+\newcommand{\framedhslinecorrect}[2]%
+  {#1[#2]}
+
+\newcommand{\framedhs}{\sethscode{framedhscode}}
+
+% The inlinehscode environment is an experimental environment
+% that can be used to typeset displayed code inline.
+
+\newenvironment{inlinehscode}%
+  {\(\def\column##1##2{}%
+   \let\>\undefined\let\<\undefined\let\\\undefined
+   \newcommand\>[1][]{}\newcommand\<[1][]{}\newcommand\\[1][]{}%
+   \def\fromto##1##2##3{##3}%
+   \def\nextline{}}{\) }%
+
+\newcommand{\inlinehs}{\sethscode{inlinehscode}}
+
+% The joincode environment is a separate environment that
+% can be used to surround and thereby connect multiple code
+% blocks.
+
+\newenvironment{joincode}%
+  {\let\orighscode=\hscode
+   \let\origendhscode=\endhscode
+   \def\endhscode{\def\hscode{\endgroup\def\@currenvir{hscode}\\}\begingroup}
+   %\let\SaveRestoreHook=\empty
+   %\let\ColumnHook=\empty
+   %\let\resethooks=\empty
+   \orighscode\def\hscode{\endgroup\def\@currenvir{hscode}}}%
+  {\origendhscode
+   \global\let\hscode=\orighscode
+   \global\let\endhscode=\origendhscode}%
+
+\makeatother
+\EndFmtInput
+%
+%%format (bin (n) (k)) = "\Big(\vcenter{\xymatrix@R=1pt{" n "\\" k "}}\Big)"
+%------------------------------------------------------------------------------%
+
+
+%====== DEFINIR GRUPO E ELEMENTOS =============================================%
+
+\group{G99}
+\studentA{xxxxxx}{Nome }
+\studentB{xxxxxx}{Nome }
+\studentC{xxxxxx}{Nome }
+
+%==============================================================================%
+
+\begin{document}
+\sffamily
+\setlength{\parindent}{0em}
+\emergencystretch 3em
+\renewcommand{\baselinestretch}{1.25} 
+\input{Cover}
+\pagestyle{pagestyle}
+
+\newgeometry{left=25mm,right=20mm,top=25mm,bottom=25mm}
+\setlength{\parindent}{1em}
+
+\section*{Preâmbulo}
+
+Em \CP\ pretende-se ensinar a progra\-mação de computadores
+como uma disciplina científica. Para isso parte-se de um repertório de \emph{combinadores}
+que formam uma álgebra da programação % (conjunto de leis universais e seus corolários)
+e usam-se esses combinadores para construir programas \emph{composicionalmente},
+isto é, agregando programas já existentes.
+
+Na sequência pedagógica dos planos de estudo dos cursos que têm
+esta disciplina, opta-se pela aplicação deste método à programação
+em \Haskell\ (sem prejuízo da sua aplicação a outras linguagens
+funcionais). Assim, o presente trabalho prático coloca os
+alunos perante problemas concretos que deverão ser implementados em
+\Haskell. Há ainda um outro objectivo: o de ensinar a documentar
+programas, a validá-los e a produzir textos técnico-científicos de
+qualidade.
+
+Antes de abordarem os problemas propostos no trabalho, os grupos devem ler
+com atenção o anexo \ref{sec:documentacao} onde encontrarão as instruções
+relativas ao \emph{software} a instalar, etc.
+
+Valoriza-se a escrita de \emph{pouco} código que corresponda a soluções
+simples e elegantes que utilizem os combinadores de ordem superior estudados
+na disciplina.
+
+\noindent \textbf{Avaliação}. Faz parte da avaliação do trabalho a sua defesa
+por parte dos elementos de cada grupo. Estes devem estar preparados para
+responder a perguntas sobre \emph{qualquer} dos problemas deste enunciado.
+A prestação \emph{individual} de cada aluno nessa defesa oral será uma componente
+importante e diferenciadora da avaliação.
+
+
+\Problema
+
+Uma serialização (ou travessia) de uma árvore é uma sua representação sob a forma de uma lista. 
+Na biblioteca \ensuremath{\Conid{BTree}} encontram-se as funções de serialização \ensuremath{\Varid{inordt}}, \ensuremath{\Varid{preordt}} e \ensuremath{\Varid{postordt}},
+que fazem as travessias \emph{in-order}, \emph{ pre-order} e \emph{post-order}, respectivamente.
+Todas essas travessias são catamorfismos que percorrem a árvore argumento em regime \emph{depth-first}.
+
+Pretende-se agora uma função \ensuremath{\Varid{bforder}} que faça a travessia em regime \emph{breadth-first},
+isto é, por níveis.
+Por exemplo, para a árvore \ensuremath{t_1 } dada em anexo e mostrada na figura a seguir,
+
+\begin{center}
+	\figura
+\end{center}
+
+\noindent a função deverá dar a lista
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{9}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[9]{}[\mskip1.5mu \mathrm{5},\mathrm{3},\mathrm{7},\mathrm{1},\mathrm{4},\mathrm{6},\mathrm{8}\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\noindent em que se vê como os níveis \ensuremath{\mathrm{5}}, depois \ensuremath{\mathrm{3},\mathrm{7}} e finalmente \ensuremath{\mathrm{1},\mathrm{4},\mathrm{6},\mathrm{8}} foram percorridos.
+
+Pretendemos propor duas versões dessa função:
+
+\begin{enumerate}
+\item	Uma delas envolve um catamorfismo de \ensuremath{\Conid{BTree}}s:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{bfsLevels}\mathbin{::}\Conid{BTree}\;\Varid{a}\to [\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{bfsLevels}\mathrel{=}\Varid{concat}\comp \Varid{levels}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Complete a definição desse catamorfismo:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{levels}\mathbin{::}\Conid{BTree}\;\Varid{a}\to [\mskip1.5mu [\mskip1.5mu \Varid{a}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{levels}\mathrel{=}\llparenthesis\, \Varid{glevels}\,\rrparenthesis{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\item A segunda proposta,
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{bft}\mathbin{::}\Conid{BTree}\;\Varid{a}\to [\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+deverá basear-se num anamorfismo de listas.
+\end{enumerate}
+\textbf{Sugestão}: estudar o artigo \cite{Ok00} cujo PDF está incluído no material deste trabalho. 
+Quando fizer testes ao seu código pode, se desejar, usar funções disponíveis na biblioteca
+\ensuremath{\Conid{Exp}} para visualizar as árvores em GraphViz (formato .dot).
+
+Justifique devidamente a sua resolução, que deverá vir acompanhada de diagramas explicativos.
+Como já se disse, valoriza-se a escrita de \emph{pouco} código que corresponda a soluções
+simples e elegantes que utilizem os combinadores de ordem superior estudados
+na disciplina.
+
+
+
+\Problema
+
+Considere a seguinte função em Haskell:
+\begin{quote}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{10}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{23}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{32}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{39}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{46}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{52}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{f}\;\Varid{x}\mathrel{=}\Varid{wrapper}\comp \Varid{worker}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{10}{}\<[10]%
+\>[10]{}\Varid{wrapper}\mathrel{=}\Varid{head}{}\<[E]%
+\\
+\>[B]{}\hsindent{10}{}\<[10]%
+\>[10]{}\Varid{worker}\;\mathrm{0}\mathrel{=}\Varid{start}\;\Varid{x}{}\<[E]%
+\\
+\>[B]{}\hsindent{10}{}\<[10]%
+\>[10]{}\Varid{worker}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}\Varid{loop}\;\Varid{x}\;(\Varid{worker}\;\Varid{n}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{loop}\;\Varid{x}\;{}\<[11]%
+\>[11]{}[\mskip1.5mu \Varid{s},{}\<[23]%
+\>[23]{}\Varid{h},{}\<[32]%
+\>[32]{}\Varid{k},{}\<[39]%
+\>[39]{}\Varid{j},{}\<[46]%
+\>[46]{}\Varid{m}{}\<[52]%
+\>[52]{}\mskip1.5mu]\mathrel{=}{}\<[E]%
+\\
+\>[11]{}[\mskip1.5mu \Varid{h}\mathbin{/}\Varid{k}\mathbin{+}\Varid{s},\Varid{x}\mathbin{\uparrow}\mathrm{2}\mathbin{*}\Varid{h},\Varid{k}\mathbin{*}\Varid{j},\Varid{j}\mathbin{+}\Varid{m},\Varid{m}\mathbin{+}\mathrm{8}\mskip1.5mu]{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{start}\;\Varid{x}\mathrel{=}[\mskip1.5mu \Varid{x},{}\<[23]%
+\>[23]{}\Varid{x}\mathbin{\uparrow}\mathrm{3},{}\<[32]%
+\>[32]{}\mathrm{6},{}\<[39]%
+\>[39]{}\mathrm{20},{}\<[46]%
+\>[46]{}\mathrm{22}{}\<[52]%
+\>[52]{}\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{quote}
+Pode-se provar pela lei de recursividade mútua que \ensuremath{\Varid{f}\;\Varid{x}\;\Varid{n}} calcula o seno hiperbólico de \ensuremath{\Varid{x}},
+\ensuremath{\Varid{sinh}\;\Varid{x}}, para \ensuremath{\Varid{n}} aproximações da sua série de Taylor. 
+Faça a derivação da função dada a partir da referida série de Taylor, apresentando todos os cálculos justificativos, tal como se faz para outras funções no capítulo respectivo do texto base desta UC \cite{Ol98-24}.
+
+\Problema
+
+Quem em Braga observar, ao fim da tarde, o tráfego onde a Avenida Clairmont
+Fernand se junta à N101, aproximadamente na coordenada \href{https://maps.app.goo.gl/uCbXLsdibYoochr36}{41°33'46.8"N
+8°24'32.4"W} --- ver as setas da figura que se segue --- reparará nas sequências
+imparáveis (infinitas!) de veículos provenientes dessas vias de circulação.
+
+Mas também irá observar um comportamento interessante por parte dos condutores desses
+veículos: por regra, \emph{cada carro numa via deixa passar, à sua frente, exactamente outro carro da outra via}. 
+
+\begin{center}
+	\mapa
+\end{center}
+
+Este comportamento \emph{civilizado} chama-se \emph{fair-merge} (ou \emph{fair-interleaving})
+de duas sequências infinitas, também designadas \emph{streams} em ciência
+da computação. Seja dado o tipo dessas sequências em Haskell,
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathbf{data}\;\Conid{Stream}\;\Varid{a}\mathrel{=}\Conid{Cons}\;(\Varid{a},\Conid{Stream}\;\Varid{a})\;\mathbf{deriving}\;\Conid{Show}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+para o qual se define também:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\mathsf{out}\;(\Conid{Cons}\;(\Varid{x},\Varid{xs}))\mathrel{=}(\Varid{x},\Varid{xs}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\noindent O referido comportamento civilizado pode definir-se, em Haskell,
+da forma seguinte:\footnote{O facto das sequências serem infinitas não nos
+deve preocupar, pois em Haskell isso é lidado de forma transparente por \lazy{lazy
+evaluation}.}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{4}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{fair\char95 merge}\mathbin{::}(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})+(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})\to \Conid{Stream}\;\Varid{a}{}\<[E]%
+\\
+\>[B]{}\Varid{fair\char95 merge}\mathrel{=}\alt{\Varid{h}}{\Varid{k}}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{4}{}\<[4]%
+\>[4]{}\Varid{h}\;(\Conid{Cons}\;(\Varid{x},\Varid{xs}),\Varid{y})\mathrel{=}\Conid{Cons}\;(\Varid{x},\Varid{k}\;(\Varid{xs},\Varid{y})){}\<[E]%
+\\
+\>[B]{}\hsindent{4}{}\<[4]%
+\>[4]{}\Varid{k}\;(\Varid{x},\Conid{Cons}\;(\Varid{y},\Varid{ys}))\mathrel{=}\Conid{Cons}\;(\Varid{y},\Varid{h}\;(\Varid{x},\Varid{ys})){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Defina \ensuremath{\Varid{fair\char95 merge}} como um \textbf{anamorfismo} de \ensuremath{\Conid{Stream}}s, usando o combinador
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\lanabracket\,\Varid{g}\,\ranabracket\mathrel{=}\Conid{Cons}\comp (\Varid{id}\times\lanabracket\,\Varid{g}\,\ranabracket)\comp \Varid{g}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+e a seguinte estratégia:
+\begin{itemize}
+\item	Derivar a lei \textbf{dual} da recursividade mútua,
+\begin{eqnarray}
+	\ensuremath{\alt{\Varid{f}}{\Varid{g}}\mathrel{=}\ana{\alt{\Varid{h}}{\Varid{k}}}} & \equiv & \ensuremath{\begin{lcbr}\Varid{out}\comp \Varid{f}\mathrel{=}\fun F \;\alt{\Varid{f}}{\Varid{g}}\comp \Varid{h}\\\Varid{out}\comp \Varid{g}\mathrel{=}\fun F \;\alt{\Varid{f}}{\Varid{g}}\comp \Varid{k}\end{lcbr}}
+	\label{eq:fokkinga_dual}
+\end{eqnarray}
+	tal como se fez, nas aulas, para a que está no formulário.
+\item
+	Usar (\ref{eq:fokkinga_dual}) na resolução do problema proposto. 
+\end{itemize}
+Justificar devidamente a resolução, que deverá vir acompanhada de diagramas explicativos.
+
+\Problema
+
+Como se sabe, é possível pensarmos em catamorfismos, anamorfismos etc \emph{probabilísticos},
+quer dizer, programas recursivos que dão distribuições como resultados. Por
+exemplo, podemos pensar num combinador
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{pcataList}\mathbin{::}(()+(\Varid{a},\Varid{b})\to \fun{Dist}\;\Varid{b})\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \fun{Dist}\;\Varid{b}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+que é muito parecido com
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\llparenthesis\, \cdot \,\rrparenthesis\mathbin{::}(()+(\Varid{a},\Varid{b})\to \Varid{b})\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \Varid{b}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+da biblioteca \List. A principal diferença é que o gene de \ensuremath{\Varid{pcataList}} é uma função probabilística.
+
+Como exemplo de utilização, recorde-se que \ensuremath{\llparenthesis\, \alt{\Varid{zero}}{\Varid{add}}\,\rrparenthesis} soma todos
+os elementos da lista argumento, por exemplo:
+\begin{quote}
+\ensuremath{\llparenthesis\, \alt{\Varid{zero}}{\Varid{add}}\,\rrparenthesis\;[\mskip1.5mu \mathrm{20},\mathrm{10},\mathrm{5}\mskip1.5mu]\mathrel{=}\mathrm{35}}.
+\end{quote}
+Considere-se agora a função \ensuremath{\Varid{padd}} (adição probabilística) que,
+com probabilidade $90\%$ soma dois números e com probabilidade $10\%$ os subtrai:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{padd}\;(\Varid{a},\Varid{b})\mathrel{=}\Conid{D}\;[\mskip1.5mu (\Varid{a}\mathbin{+}\Varid{b},\mathrm{0.9}),(\Varid{a}\mathbin{-}\Varid{b},\mathrm{0.1})\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+Se se correr
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{d4}\mathrel{=}\Varid{pcataList}\;\alt{\Varid{pzero}}{\Varid{padd}}\;[\mskip1.5mu \mathrm{20},\mathrm{10},\mathrm{5}\mskip1.5mu]\;\mathbf{where}\;\Varid{pzero}\mathrel{=}\Varid{return}\comp \Varid{zero}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+obter-se-á:
+\begin{Verbatim}[fontsize=\small]
+35  81.0%
+25   9.0%
+ 5   9.0%
+15   1.0%
+\end{Verbatim}
+
+Com base neste exemplo, resolva o seguinte
+\begin{quote}\em
+\textbf{Problema}: Uma unidade militar pretende enviar uma mensagem urgente
+a outra, mas tem o aparelho de telegrafia meio avariado. Por experiência,
+o telegrafista sabe que a probabilidade de uma palavra se perder (não ser
+transmitida) é $5\%$; e que, no final de cada mensagem, o aparelho envia o código
+\ensuremath{\text{\ttfamily \char34 stop\char34}}, mas (por estar meio avariado), falha $10\%$ das vezes.
+
+Qual a probabilidade de a palavra \ensuremath{\text{\ttfamily \char34 atacar\char34}} da mensagem 
+\begin{quote}
+\ensuremath{\Varid{words}\;\text{\ttfamily \char34 Vamos~atacar~hoje\char34}}
+\end{quote}
+se perder, isto é, o resultado da transmissão ser \ensuremath{[\mskip1.5mu \text{\ttfamily \char34 Vamos\char34},\text{\ttfamily \char34 hoje\char34},\text{\ttfamily \char34 stop\char34}\mskip1.5mu]}?
+E a de seguirem todas as palavras, mas faltar o \ensuremath{\text{\ttfamily \char34 stop\char34}} no fim? E a da transmissão
+ser perfeita?
+\end{quote}
+
+Responda a estas perguntas encontrando \ensuremath{\Varid{gene}} tal que
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{transmitir}\mathrel{=}\Varid{pcataList}\;\Varid{gene}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+descreve o comportamento do aparelho.
+Justificar devidamente a resolução, que deverá vir acompanhada de diagramas explicativos.
+%
+
+\part*{Anexos}
+
+\appendix
+
+\section{Natureza do trabalho a realizar}
+\label{sec:documentacao}
+Este trabalho teórico-prático deve ser realizado por grupos de 3 alunos.
+Os detalhes da avaliação (datas para submissão do relatório e sua defesa
+oral) são os que forem publicados na \cp{página da disciplina} na \emph{internet}.
+
+Recomenda-se uma abordagem participativa dos membros do grupo em \textbf{todos}
+os exercícios do trabalho, para assim poderem responder a qualquer questão
+colocada na \emph{defesa oral} do relatório.
+
+Para cumprir de forma integrada os objectivos do trabalho vamos recorrer
+a uma técnica de programa\-ção dita ``\litp{literária}'' \cite{Kn92}, cujo
+princípio base é o seguinte:
+%
+\begin{quote}\em
+        Um programa e a sua documentação devem coincidir.
+\end{quote}
+%
+Por outras palavras, o \textbf{código fonte} e a \textbf{documentação} de um
+programa deverão estar no mesmo ficheiro.
+
+O ficheiro \texttt{cp2526t.pdf} que está a ler é já um exemplo de
+\litp{programação literária}: foi gerado a partir do texto fonte
+\texttt{cp2526t.lhs}\footnote{O sufixo `lhs' quer dizer
+\emph{\lhaskell{literate Haskell}}.} que encontrará no \MaterialPedagogico\
+desta disciplina des\-com\-pactando o ficheiro \texttt{cp2526t.zip}.
+
+Como se mostra no esquema abaixo, de um único ficheiro (\ensuremath{\Varid{lhs}})
+gera-se um PDF ou faz-se a interpretação do código \Haskell\ que ele inclui:
+
+        \esquema
+
+Vê-se assim que, para além do \GHCi, serão necessários os executáveis \PdfLatex\ e
+\LhsToTeX. Para facilitar a instalação e evitar problemas de versões e
+conflitos com sistemas operativos, é recomendado o uso do \Docker\ tal como
+a seguir se descreve.
+
+\section{Docker} \label{sec:docker}
+
+Recomenda-se o uso do \container\ cuja imagem é gerada pelo \Docker\ a partir do ficheiro
+\texttt{Dockerfile} que se encontra na diretoria que resulta de descompactar
+\texttt{cp2526t.zip}. Este \container\ deverá ser usado na execução
+do \GHCi\ e dos comandos relativos ao \Latex. (Ver também a \texttt{Makefile}
+que é disponibilizada.)
+
+Após \href{https://docs.docker.com/engine/install/}{instalar o Docker} e
+descarregar o referido zip com o código fonte do trabalho,
+basta executar os seguintes comandos:
+\begin{Verbatim}[fontsize=\small]
+    $ docker build -t cp2526t .
+    $ docker run -v ${PWD}:/cp2526t -it cp2526t
+\end{Verbatim}
+\textbf{NB}: O objetivo é que o container\ seja usado \emph{apenas} 
+para executar o \GHCi\ e os comandos relativos ao \Latex.
+Deste modo, é criado um \textit{volume} (cf.\ a opção \texttt{-v \$\{PWD\}:/cp2526t}) 
+que permite que a diretoria em que se encontra na sua máquina local 
+e a diretoria \texttt{/cp2526t} no \container\ sejam partilhadas.
+
+Pretende-se então que visualize/edite os ficheiros na sua máquina local e que
+os compile no \container, executando:
+\begin{Verbatim}[fontsize=\small]
+    $ lhs2TeX cp2526t.lhs > cp2526t.tex
+    $ pdflatex cp2526t
+\end{Verbatim}
+\LhsToTeX\ é o pre-processador que faz ``pretty printing'' de código Haskell
+em \Latex\ e que faz parte já do \container. Alternativamente, basta executar
+\begin{Verbatim}[fontsize=\small]
+    $ make
+\end{Verbatim}
+para obter o mesmo efeito que acima.
+
+Por outro lado, o mesmo ficheiro \texttt{cp2526t.lhs} é executável e contém
+o ``kit'' básico, escrito em \Haskell, para realizar o trabalho. Basta executar
+\begin{Verbatim}[fontsize=\small]
+    $ ghci cp2526t.lhs
+\end{Verbatim}
+
+\noindent Abra o ficheiro \texttt{cp2526t.lhs} no seu editor de texto preferido
+e verifique que assim é: todo o texto que se encontra dentro do ambiente
+\begin{quote}\small\tt
+\text{\ttfamily \char92{}begin\char123{}code\char125{}}
+\\ ... \\
+\text{\ttfamily \char92{}end\char123{}code\char125{}}
+\end{quote}
+é seleccionado pelo \GHCi\ para ser executado.
+
+\section{Em que consiste o TP}
+
+Em que consiste, então, o \emph{relatório} a que se referiu acima?
+É a edição do texto que está a ser lido, preenchendo o anexo \ref{sec:resolucao}
+com as respostas. O relatório deverá conter ainda a identificação dos membros
+do grupo de trabalho, no local respectivo da folha de rosto.
+
+Para gerar o PDF integral do relatório deve-se ainda correr os comando seguintes,
+que actualizam a bibliografia (com \Bibtex) e o índice remissivo (com \Makeindex),
+\begin{Verbatim}[fontsize=\small]
+    $ bibtex cp2526t.aux
+    $ makeindex cp2526t.idx
+\end{Verbatim}
+e recompilar o texto como acima se indicou. (Como já se disse, pode fazê-lo
+correndo simplesmente \texttt{make} no \container.)
+
+No anexo \ref{sec:codigo} disponibiliza-se algum código \Haskell\ relativo
+aos problemas que são colocados. Esse anexo deverá ser consultado e analisado
+à medida que isso for necessário.
+
+Deve ser feito uso da \litp{programação literária} para documentar bem o código que se
+desenvolver, em particular fazendo diagramas explicativos do que foi feito e
+tal como se explica no anexo \ref{sec:diagramas} que se segue.
+
+\section{Como exprimir cálculos e diagramas em LaTeX/lhs2TeX} \label{sec:diagramas}
+
+Como primeiro exemplo, estudar o texto fonte (\lhstotex{lhs}) do que está a ler\footnote{
+Procure e.g.\ por \texttt{"sec:diagramas"}.} onde se obtém o efeito seguinte:\footnote{Exemplos
+tirados de \cite{Ol98-24}.}
+\begin{eqnarray*}
+\start
+\ensuremath{\Varid{id}\mathrel{=}\conj{\Varid{f}}{\Varid{g}}}
+\just\equiv{ universal property }
+\ensuremath{\begin{lcbr}\p1\comp \Varid{id}\mathrel{=}\Varid{f}\\\p2\comp \Varid{id}\mathrel{=}\Varid{g}\end{lcbr}}
+\just\equiv{ identity }
+\ensuremath{\begin{lcbr}\p1\mathrel{=}\Varid{f}\\\p2\mathrel{=}\Varid{g}\end{lcbr}}
+\qed
+\end{eqnarray*}
+
+Os diagramas podem ser produzidos recorrendo à \emph{package} \Xymatrix, por exemplo:
+\begin{eqnarray*}
+\xymatrix@C=2cm{
+    \ensuremath{\N_0}
+           \ar[d]_-{\ensuremath{\cataNat{\Varid{g}}}}
+&
+    \ensuremath{\mathrm{1}\mathbin{+}\N_0}
+           \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}\cataNat{\Varid{g}}}}
+           \ar[l]_-{\ensuremath{\mathsf{in}}}
+\\
+     \ensuremath{\Conid{B}}
+&
+     \ensuremath{\mathrm{1}\mathbin{+}\Conid{B}}
+           \ar[l]^-{\ensuremath{\Varid{g}}}
+}
+\end{eqnarray*}
+
+\section{O mónade das distribuições probabilísticas} \label{sec:probabilities}
+Mónades são functores com propriedades adicionais que nos permitem obter
+efeitos especiais em progra\-mação. Por exemplo, a biblioteca \Probability\
+oferece um mónade para abordar problemas de probabilidades. Nesta biblioteca,
+o conceito de distribuição estatística é captado pelo tipo
+\begin{eqnarray}
+     \ensuremath{\mathbf{newtype}\;\fun{Dist}\;\Varid{a}\mathrel{=}\Conid{D}\;\{\mskip1.5mu \Varid{unD}\mathbin{::}[\mskip1.5mu (\Varid{a},\Conid{ProbRep})\mskip1.5mu]\mskip1.5mu\}}
+     \label{eq:Dist}
+\end{eqnarray}
+em que \ensuremath{\Conid{ProbRep}} é um real de \ensuremath{\mathrm{0}} a \ensuremath{\mathrm{1}}, equivalente a uma escala de $0$ a
+$100 \%$.
+
+Cada par \ensuremath{(\Varid{a},\Varid{p})} numa distribuição \ensuremath{\Varid{d}\mathbin{::}\fun{Dist}\;\Varid{a}} indica que a probabilidade
+de \ensuremath{\Varid{a}} é \ensuremath{\Varid{p}}, devendo ser garantida a propriedade de  que todas as probabilidades
+de \ensuremath{\Varid{d}} somam $100\%$.
+Por exemplo, a seguinte distribuição de classificações por escalões de $A$ a $E$,
+\[
+\begin{array}{ll}
+A & \rule{2mm}{3pt}\ 2\%\\
+B & \rule{12mm}{3pt}\ 12\%\\
+C & \rule{29mm}{3pt}\ 29\%\\
+D & \rule{35mm}{3pt}\ 35\%\\
+E & \rule{22mm}{3pt}\ 22\%\\
+\end{array}
+\]
+será representada pela distribuição
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{d1}\mathbin{::}\fun{Dist}\;\Conid{Char}{}\<[E]%
+\\
+\>[B]{}\Varid{d1}\mathrel{=}\Conid{D}\;[\mskip1.5mu (\text{\ttfamily 'A'},\mathrm{0.02}),(\text{\ttfamily 'B'},\mathrm{0.12}),(\text{\ttfamily 'C'},\mathrm{0.29}),(\text{\ttfamily 'D'},\mathrm{0.35}),(\text{\ttfamily 'E'},\mathrm{0.22})\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+que o \GHCi\ mostrará assim:
+\begin{Verbatim}[fontsize=\small]
+'D'  35.0%
+'C'  29.0%
+'E'  22.0%
+'B'  12.0%
+'A'   2.0%
+\end{Verbatim}
+É possível definir geradores de distribuições, por exemplo distribuições \emph{uniformes},
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{d2}\mathrel{=}\Varid{uniform}\;(\Varid{words}\;\text{\ttfamily \char34 Uma~frase~de~cinco~palavras\char34}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+isto é
+\begin{Verbatim}[fontsize=\small]
+     "Uma"  20.0%
+   "cinco"  20.0%
+      "de"  20.0%
+   "frase"  20.0%
+"palavras"  20.0%
+\end{Verbatim}
+distribuição \emph{normais}, eg.\
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{d3}\mathrel{=}\Varid{normal}\;[\mskip1.5mu \mathrm{10}\mathinner{\ldotp\ldotp}\mathrm{20}\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+etc.\footnote{Para mais detalhes ver o código fonte de \Probability, que é uma adaptação da
+biblioteca \PFP\ (``Probabilistic Functional Programming''). Para quem quiser saber mais
+recomenda-se a leitura do artigo \cite{EK06}.}
+\ensuremath{\fun{Dist}} forma um \textbf{mónade} cuja unidade é \ensuremath{\Varid{return}\;\Varid{a}\mathrel{=}\Conid{D}\;[\mskip1.5mu (\Varid{a},\mathrm{1})\mskip1.5mu]} e cuja composição de Kleisli
+é (simplificando a notação)
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[3]{}(\Varid{f}\kcomp \Varid{g})\;\Varid{a}\mathrel{=}[\mskip1.5mu (\Varid{y},\Varid{q}\mathbin{*}\Varid{p})\mid (\Varid{x},\Varid{p})\leftarrow \Varid{g}\;\Varid{a},(\Varid{y},\Varid{q})\leftarrow \Varid{f}\;\Varid{x}\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+em que \ensuremath{\Varid{g}\mathbin{:}\Conid{A}\to \fun{Dist}\;\mathit B} e \ensuremath{\Varid{f}\mathbin{:}\mathit B\to \fun{Dist}\;\mathit C} são funções \textbf{monádicas} que representam
+\emph{computações probabilísticas}.
+
+Este mónade é adequado à resolução de problemas de \emph{probabilidades e estatística} usando programação funcional, de forma elegante e como caso particular da programação monádica.
+
+\section{Código fornecido}\label{sec:codigo}
+
+\subsection*{Problema 1}
+
+Árvores exemplo:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{3}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{4}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{12}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}t_1 \mathbin{::}\Conid{BTree}\;\Conid{Int}{}\<[E]%
+\\
+\>[B]{}t_1 \mathrel{=}\Conid{Node}\;(\mathrm{5},(\Conid{Node}\;(\mathrm{3},(\Conid{Node}\;(\mathrm{1},(\Conid{Empty},\Conid{Empty})),\Conid{Node}\;(\mathrm{4},(\Conid{Empty},\Conid{Empty})))),{}\<[E]%
+\\
+\>[B]{}\hsindent{12}{}\<[12]%
+\>[12]{}\Conid{Node}\;(\mathrm{7},(\Conid{Node}\;(\mathrm{6},(\Conid{Empty},\Conid{Empty})),\Conid{Node}\;(\mathrm{8},(\Conid{Empty},\Conid{Empty})))))){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}t_2 \mathbin{::}\Conid{BTree}\;\Conid{Int}{}\<[E]%
+\\
+\>[B]{}t_2 \mathrel{=}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{node}\;\mathrm{1}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}(\Varid{node}\;\mathrm{2}\;(\Varid{node}\;\mathrm{4}\;\Conid{Empty}\;\Conid{Empty})\;(\Varid{node}\;\mathrm{5}\;\Conid{Empty}\;\Conid{Empty}))\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}(\Varid{node}\;\mathrm{3}\;(\Varid{node}\;\mathrm{6}\;\Conid{Empty}\;\Conid{Empty})\;(\Varid{node}\;\mathrm{7}\;\Conid{Empty}\;\Conid{Empty})){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}t_3 \mathbin{::}\Conid{BTree}\;\Conid{Char}{}\<[E]%
+\\
+\>[B]{}t_3 \mathrel{=}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{node}\;\text{\ttfamily 'A'}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}(\Varid{node}\;\text{\ttfamily 'B'}\;(\Varid{node}\;\text{\ttfamily 'C'}\;(\Varid{node}\;\text{\ttfamily 'D'}\;\Conid{Empty}\;\Conid{Empty})\;\Conid{Empty})\;\Conid{Empty})\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}(\Varid{node}\;\text{\ttfamily 'E'}\;\Conid{Empty}\;\Conid{Empty}){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}t_4 \mathbin{::}\Conid{BTree}\;\Conid{Char}{}\<[E]%
+\\
+\>[B]{}t_4 \mathrel{=}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{node}\;\text{\ttfamily 'A'}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}(\Varid{node}\;\text{\ttfamily 'B'}\;(\Varid{node}\;\text{\ttfamily 'C'}\;(\Varid{node}\;\text{\ttfamily 'D'}\;\Conid{Empty}\;\Conid{Empty})\;\Conid{Empty})\;\Conid{Empty})\;{}\<[E]%
+\\
+\>[3]{}\hsindent{2}{}\<[5]%
+\>[5]{}\Conid{Empty}{}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}t_5 \mathbin{::}\Conid{BTree}\;\Conid{Int}{}\<[E]%
+\\
+\>[B]{}t_5 \mathrel{=}{}\<[E]%
+\\
+\>[B]{}\hsindent{3}{}\<[3]%
+\>[3]{}\Varid{node}\;\mathrm{1}\;{}\<[E]%
+\\
+\>[3]{}\hsindent{1}{}\<[4]%
+\>[4]{}(\Varid{node}\;\mathrm{2}\;(\Varid{node}\;\mathrm{4}\;\Conid{Empty}\;\Conid{Empty})\;\Conid{Empty})\;{}\<[E]%
+\\
+\>[3]{}\hsindent{1}{}\<[4]%
+\>[4]{}(\Varid{node}\;\mathrm{3}\;\Conid{Empty}\;(\Varid{node}\;\mathrm{5}\;(\Varid{node}\;\mathrm{6}\;\Conid{Empty}\;\Conid{Empty})\;\Conid{Empty})){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{node}\;\Varid{a}\;\Varid{b}\;\Varid{c}\mathrel{=}\Conid{Node}\;(\Varid{a},(\Varid{b},\Varid{c})){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+%----------------- Soluções dos alunos -----------------------------------------%
+
+\section{Soluções dos alunos}\label{sec:resolucao}
+Os alunos devem colocar neste anexo as suas soluções para os exercícios
+propostos, de acordo com o ``layout'' que se fornece.
+Não podem ser alterados os nomes ou tipos das funções dadas, mas pode ser
+adicionado texto ao anexo, bem como diagramas e/ou outras funções auxiliares
+que sejam necessárias.
+
+\noindent
+\textbf{Importante}: Não pode ser alterado o texto deste ficheiro fora deste anexo.
+
+\subsection*{Problema 1}
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{glevels}\mathrel{=}\bot {}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{bft}\;\Varid{t}\mathrel{=}\bot {}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\subsection*{Problema 2}
+
+\subsection*{Problema 3}
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{fair\char95 merge'}\mathrel{=}\lanabracket\,\bot \,\ranabracket{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\subsection*{Problema 4}
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{pcataList}\mathrel{=}\bot {}\<[E]%
+\\
+\>[B]{}\Varid{gene}\mathrel{=}\bot {}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+
+%----------------- Índice remissivo (exige makeindex) -------------------------%
+
+\printindex
+
+%----------------- Bibliografia (exige bibtex) --------------------------------%
+
+\bibliographystyle{plain}
+\bibliography{cp2526t}
+
+%----------------- Fim do documento -------------------------------------------%
+\end{document}

@@ -1,0 +1,25 @@
+\begin{thebibliography}{1}
+
+\bibitem{Kn92}
+D.E. Knuth.
+\newblock {\em Literate Programming}.
+\newblock CSLI Lecture Notes Number 27. Stanford University Center for the
+  Study of Language and Information, Stanford, CA, USA, 1992.
+
+\bibitem{Ok00}
+Chris Okasaki.
+\newblock Breadth-first numbering: lessons from a small exercise in algorithm
+  design.
+\newblock In Martin Odersky and Philip Wadler, editors, {\em Proceedings of the
+  Fifth {ACM} {SIGPLAN} International Conference on Functional Programming
+  {(ICFP} '00), Montreal, Canada, September 18-21, 2000}, pages 131--136.
+  {ACM}, 2000.
+
+\bibitem{Ol98-24}
+J.N. Oliveira.
+\newblock {Program Design by Calculation}, 2024.
+\newblock Draft of textbook in preparation. First version: 1998. Current
+  version: Sep. 2024. Informatics Department, University of Minho
+  (\href{http://www.di.uminho.pt/~jno/ps/pdbc.pdf}{\textsc{pdf}}).
+
+\end{thebibliography}
