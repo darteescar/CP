@@ -125,10 +125,10 @@
 
 %====== DEFINIR GRUPO E ELEMENTOS =============================================%
 
-\group{G99}
-\studentA{xxxxxx}{Nome }
-\studentB{xxxxxx}{Nome }
-\studentC{xxxxxx}{Nome }
+\group{G05}
+\studentA{106936}{Duarte Escairo }
+\studentB{106932}{Luís Soares }
+\studentC{106856}{Tiago Figueiredo }
 
 %==============================================================================%
 
@@ -665,6 +665,22 @@ que sejam necessárias.
 \textbf{Importante}: Não pode ser alterado o texto deste ficheiro fora deste anexo.
 
 \subsection*{Problema 1}
+Na primeira versão proposta para a resolução do \textbf{Problema 1}, pretende-se
+usar um catamorfismo de |BTrees| para se fazer a travessia \emph{in-order} em regime \emph{breadth-first}.
+
+Se repararmos, o resultado de aplicarmos a função |levels| a uma |BTree| é uma lista de listas,
+onde cada uma dessas listas internas corresponde aos valores dos nós de um nível da árvore. Ou seja,
+a aplicação de |levels| à árvore |t1|, por exemplo, resulta na lista de listas:
+
+\begin{spec}
+[[5],[3,7],[1,4,6,8]]
+\end{spec}
+
+Para depois obter a travessia |bforder|, basta concatenar todas as listas internas, o que é feito
+pela função |concat|, já na função |bfsLevels|.
+
+O desafio aqui está em encontrar o gene (|glevels|) do catamorfismo |levels|. 
+Para começar, podemos representar esse catamorfismo através do seguinte diagrama:
 
 \begin{eqnarray*}
 \centerline{
@@ -685,12 +701,68 @@ que sejam necessárias.
 }
 \end{eqnarray*}
 
+A partir deste diagrama, percebemos que o gene do catamorfismo deverá, para obter a tal lista de listas,
+colocar o valor da raiz no início da lista, seguido das listas dos níveis das subárvores esquerda e direita.
+Contudo essas listas dos níveis das subárvores estão também organizadas por níveis, ou seja,
+a primeira lista corresponde ao nível 1, a segunda ao nível 2, etc. No caso da àrvore |t1|, por exemplo,
+a aplicação de |levels| às subárvores esquerda e direita de |t1| resulta, respectivamente, nas listas de listas:
+\begin{spec}
+[[3],[1,4]] e [[7],[6,8]]
+\end{spec}
+
+Neste caso o passo final seria colocar o valor da raiz |5| (|[5]|) no início da lista, 
+e depois juntar as listas dos níveis das subárvores esquerda e direita,
+o que se faz com a função |zipWith (++)|, que concatena as listas correspondentes de duas listas de listas.
+
+Desta forma o comportamento do gene |glevels| pode ser representado por este diagrama:
+
+\begin{eqnarray*}
+\centerline{
+     \xymatrix@@C=2cm@@R=2cm{
+     &
+          |Seq ((Seq A))|
+     &
+     \\
+          |1|
+               \ar[ur]^-{|nil|}
+               \ar[r]_-{|i1|}
+     &
+          |1 + A >< (Seq((Seq A)) >< Seq((Seq A)))|
+               \ar[u]^-{|either nil f|}
+     &
+          |A >< (Seq((Seq A)) >< Seq((Seq A)))|
+               \ar[l]^-{|i2|}
+               \ar[ul]_-{|f|}
+     }
+}
+\end{eqnarray*}
+
+Assim sendo o código que define o gene |glevels| é o seguinte:
+
 \begin{code}
 glevels :: Either () (a, ([[a]],[[a]])) -> [[a]]
 glevels = either nil f
      where f(root, (l,r)) = [root] : zipWith (++) l r
 \end{code}
 
+Tal como descrito anteriormente, |f| coloca o valor da raiz à cabeça da lista,
+seguido da concatenação das listas dos níveis das subárvores esquerda e direita,
+com a função |zipWith (++)|.
+
+
+Para a segunda versão proposta para a resolução do \textbf{Problema 1}, pretende-se
+usar um anamorfismo de listas para se fazer a travessia \emph{in-order} em regime \emph{breadth-first}.
+
+Com o estudo do artigo \cite{Ok00}, percebemos que é possível fazer a travessia \emph{breadth-first}
+em |BTrees|, usando uma floresta, ao invés de uma árvore, para representar os nós a visitar
+(neste caso uma floresta é uma lista de |BTrees|).
+
+A ideia do algoritmo é visitar os nós da floresta, retirando o valor do nó da frente da lista,
+adicionando o seu valor à lista resultado (caso não seja |Empty|) e 
+adicionando à floresta os filhos esquerdo e direito do nó visitado (caso não seja |Empty|), 
+mas colocando-os no final da lista. Este processo repete-se até que a floresta esteja vazia.
+
+Para representar este algoritmo como um anamorfismo, começamos por desenhar o seguinte diagrama:
 
 \begin{eqnarray*}
 \centerline{
@@ -711,6 +783,11 @@ glevels = either nil f
 }
 \end{eqnarray*}
 
+Contudo, como referido anteriormente, o algoritmo usa uma floresta (lista de |BTrees|), e não um |BTree|, 
+que é o input da função |bft|. Desta forma é necesário garantir que a |BTree| argumento seja convertida
+numa floresta, para poder ser usada no anamorfismo. Para isso, usamos a função |singl|,
+que transforma uma |BTree| numa floresta com apenas essa |BTree| (lista com apenas um elemento).
+
 \begin{eqnarray*}
 \centerline{
      \xymatrix@@C=3cm{
@@ -722,9 +799,19 @@ glevels = either nil f
 }
 \end{eqnarray*}
 
+Assim sendo, a função |bft| é definida como a composição do anamorfismo |anaList geneBF|
+com a função |singl|, como se mostra a seguir:
+
 \begin{code}
 bft = (anaList geneBF) . singl
 \end{code}
+
+Para o gene do anamorfismo, o comportamento é o já anteriormente descrito,
+ou seja, visitar os nós da floresta, retirando o valor do nó da frente da lista, 
+e devolvendo um par com o valor do nó e a floresta a visitar. Na floresta a visitar,
+já estarão adicionados os filhos esquerdo e direito do nó visitado (caso não seja |Empty|),
+colocados no final da lista.
+O anamorfismo repete este processo até que a floresta esteja vazia.
 
 \begin{code}
 geneBF :: [BTree a] -> Either () (a, [BTree a])
