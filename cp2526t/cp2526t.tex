@@ -896,18 +896,93 @@ que sejam necessárias.
 
 \subsection*{Problema 1}
 
+\begin{eqnarray*}
+\centerline{
+     \xymatrix@C=5cm@R=2cm{
+          \ensuremath{\Conid{BTree}\;\Conid{A}}
+               \ar[d]_-{\ensuremath{\Varid{levels}\mathrel{=}\llparenthesis\, \Varid{glevels}\,\rrparenthesis}}
+               \ar@/^1pc/[r]^-{\ensuremath{\Varid{outBTree}}}
+     &
+          \ensuremath{\mathrm{1}\mathbin{+}\Conid{A}\times(\Conid{BTree}\;\Conid{A}\times\Conid{BTree}\;\Conid{A})}
+               \ar[d]^{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times(\Varid{levels}\times\Varid{levels})}}
+               \ar@/^1pc/[l]^-{\ensuremath{\Varid{inBTree}}}
+     \\
+          \ensuremath{{({\Conid{A}}^{*})}^{*}}
+     &
+          \ensuremath{\mathrm{1}\mathbin{+}\Conid{A}\times({({\Conid{A}}^{*})}^{*}\times{({\Conid{A}}^{*})}^{*})}
+               \ar@/^1pc/[l]^-{\ensuremath{\Varid{glevels}}}
+     }
+}
+\end{eqnarray*}
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{6}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{glevels}\mathbin{::}()+(\Varid{a},([\mskip1.5mu [\mskip1.5mu \Varid{a}\mskip1.5mu]\mskip1.5mu],[\mskip1.5mu [\mskip1.5mu \Varid{a}\mskip1.5mu]\mskip1.5mu]))\to [\mskip1.5mu [\mskip1.5mu \Varid{a}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{glevels}\mathrel{=}\alt{\Varid{nil}}{\Varid{f}}{}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\mathbf{where}\;\Varid{f}\;(\Varid{root},(\Varid{l},\Varid{r}))\mathrel{=}[\mskip1.5mu \Varid{root}\mskip1.5mu]\mathbin{:}\Varid{zipWith}\;(\mathbin{+\!\!+})\;\Varid{l}\;\Varid{r}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+
+\begin{eqnarray*}
+\centerline{
+     \xymatrix@C=5cm@R=2cm{
+          \ensuremath{{\Conid{A}}^{*}}
+               \ar@/^1pc/[r]^-{\ensuremath{\Varid{outBTree}}}
+     &
+          \ensuremath{\mathrm{1}\mathbin{+}\Conid{A}\times{\Conid{A}}^{*}}
+               \ar@/^1pc/[l]^-{\ensuremath{\Varid{inBTree}}}
+     \\
+          \ensuremath{{(\Conid{BTree}\;\Conid{A})}^{*}}
+               \ar[u]^-{\ensuremath{\anaList{\Varid{geneBF}}}}
+               \ar@/_1pc/[r]^-{\ensuremath{\Varid{geneBF}}}
+     &
+          \ensuremath{\mathrm{1}\mathbin{+}\Conid{A}\times{(\Conid{BTree}\;\Conid{A})}^{*}}
+               \ar[u]_{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\anaList{\Varid{geneBF}}}}
+     }
+}
+\end{eqnarray*}
+
+\begin{eqnarray*}
+\centerline{
+     \xymatrix@C=3cm{
+          \ensuremath{\Conid{BTree}\;\Conid{A}}
+               \ar[r]^-{\ensuremath{\Varid{singl}}}
+     &
+          \ensuremath{{(\Conid{BTree}\;\Conid{A})}^{*}}
+     }
+}
+\end{eqnarray*}
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{glevels}\mathrel{=}\bot {}\<[E]%
-\\[\blanklineskip]%
-\>[B]{}\Varid{bft}\;\Varid{t}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\Varid{bft}\mathrel{=}\anaList{\Varid{geneBF}}\comp \Varid{singl}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{geneBF}\mathbin{::}[\mskip1.5mu \Conid{BTree}\;\Varid{a}\mskip1.5mu]\to ()+(\Varid{a},[\mskip1.5mu \Conid{BTree}\;\Varid{a}\mskip1.5mu]){}\<[E]%
+\\
+\>[B]{}\Varid{geneBF}\;[\mskip1.5mu \mskip1.5mu]\mathrel{=}i_1\;(){}\<[E]%
+\\
+\>[B]{}\Varid{geneBF}\;(\Conid{Empty}\mathbin{:}\Varid{t})\mathrel{=}\Varid{geneBF}\;\Varid{t}{}\<[E]%
+\\
+\>[B]{}\Varid{geneBF}\;(\Conid{Node}\;(\Varid{a},(\Varid{l},\Varid{r}))\mathbin{:}\Varid{t})\mathrel{=}i_2\;(\Varid{a},\Varid{t}\mathbin{+\!\!+}[\mskip1.5mu \Varid{l},\Varid{r}\mskip1.5mu]){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
 \subsection*{Problema 2}
 
 \subsection*{Problema 3}
+
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%

@@ -184,7 +184,7 @@ import List hiding (fac)
 import Nat hiding (aux)
 import LTree hiding (merge)
 import BTree
--- import Exp
+import Exp
 import Probability
 -- import Svg hiding (for,dup,fdiv)
 import Data.Char
@@ -666,17 +666,77 @@ que sejam necessárias.
 
 \subsection*{Problema 1}
 
+\begin{eqnarray*}
+\centerline{
+     \xymatrix@@C=5cm@@R=2cm{
+          |BTree A|
+               \ar[d]_-{|levels = cataBTree glevels|}
+               \ar@@/^1pc/[r]^-{|outBTree|}
+     &
+          |1 + A >< (BTree A >< BTree A)|
+               \ar[d]^{|id + id >< (levels >< levels)|}
+               \ar@@/^1pc/[l]^-{|inBTree|}
+     \\
+          |Seq ((Seq A))|
+     &
+          |1 + A >< (Seq ((Seq A)) >< Seq ((Seq A)))|
+               \ar@@/^1pc/[l]^-{|glevels|}
+     }
+}
+\end{eqnarray*}
+
 \begin{code}
+glevels :: Either () (a, ([[a]],[[a]])) -> [[a]]
+glevels = either nil f
+     where f(root, (l,r)) = [root] : zipWith (++) l r
+\end{code}
 
-glevels = undefined
 
-bft t = undefined 
+\begin{eqnarray*}
+\centerline{
+     \xymatrix@@C=5cm@@R=2cm{
+          |Seq A|
+               \ar@@/^1pc/[r]^-{|outBTree|}
+     &
+          |1 + A >< Seq A|
+               \ar@@/^1pc/[l]^-{|inBTree|}
+     \\
+          |Seq ((BTree A))|
+               \ar[u]^-{|anaList geneBF|}
+               \ar@@/_1pc/[r]^-{|geneBF|}
+     &
+          |1+  A >< Seq ((BTree A))|
+               \ar[u]_{|id + id >< anaList geneBF|}
+     }
+}
+\end{eqnarray*}
 
+\begin{eqnarray*}
+\centerline{
+     \xymatrix@@C=3cm{
+          |BTree A|
+               \ar[r]^-{|singl|}
+     &
+          |Seq ((BTree A))|
+     }
+}
+\end{eqnarray*}
+
+\begin{code}
+bft = (anaList geneBF) . singl
+\end{code}
+
+\begin{code}
+geneBF :: [BTree a] -> Either () (a, [BTree a])
+geneBF [] = i1 ()
+geneBF (Empty:t) = geneBF t
+geneBF (Node (a,(l,r)):t) = i2 (a, t ++ [l,r])
 \end{code}
 
 \subsection*{Problema 2}
 
 \subsection*{Problema 3}
+
 
 \begin{code}
 fair_merge' = anaStream undefined
