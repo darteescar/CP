@@ -766,7 +766,7 @@ seguido da concatenação das listas dos níveis das subárvores esquerda e dire
 com a função |juntaListas|.
 
 Se quisermos definir |glevels| numa versão completamente |pointfree|, 
-podemos esquematizar o lado esquerdo da solução desta forma:
+podemos esquematizar o lado direito da solução desta forma:
 
 
 \begin{eqnarray*}
