@@ -874,8 +874,51 @@ Antes de apresentar a solução completa, é útil analisar cada componente que 
 
 \textbf{Uso de Dist}
 
+No nosso projeto, é necessário modelar a transmissão de mensagens em que cada palavra pode falhar de forma aleatória. Para isso, precisamos de uma forma de representar todas as mensagens possíveis e associar a cada uma a sua probabilidade de ocorrência.
+
+O mónade |Dist| faz exatamente isso:
+
+\begin{center}
+\begin{code}
+newtype Dist a = D { unD :: [(a, ProbRep)] }
+\end{code}
+\end{center}
+
+\begin{itemize}
+     \item Cada a é um possível valor (no nosso caso, uma mensagem ou palavra transmitida).
+     \item Cada ProbRep é a probabilidade desse valor ocorrer (um número real entre 0 e 1, somando 1 no total).
+\end{itemize}
+
+|Dist| forma um mónade porque:
+
+\begin{center}
+\begin{itemize}
+    \item Tem uma operação return: |return a = D [(a,1)]|, que gera uma distribuição determinística com probabilidade 1.  
+    \item Tem uma composição de Kleisli (bind >>=): $(f \bullet g)~a = [(y,q*p) \mid (x,p) \leftarrow g~a, (y,q) \leftarrow f~x]$,  
+    onde $g :: A \to \texttt{Dist B}$ e $f :: B \to \texttt{Dist C}$ são funções que representam computações probabilísticas.  
+\end{itemize}
+\end{center}
+
+Esta definição permite combinar automaticamente as probabilidades de múltiplas etapas de cálculo. Por exemplo, ao percorrer uma lista de palavras, o mónade |Dist| calcula todas as combinações possíveis de palavras transmitidas e perdidas, multiplicando as probabilidades de cada passo sem necessidade de loops ou cálculos manuais. Assim, alterações no comportamento do |gene| propagam-se corretamente em toda a lista, sem haver necessidade de mudar nada mais do que as probabilidades definidas.
+
+No contexto do nosso problema, o mónade |Dist| é particularmente útil porque permite que a função |pcataList|:
+
+\begin{itemize}
+    \item percorra a lista de palavras,  
+    \item aplique probabilisticamente o |gene| a cada elemento, e  
+    \item combine corretamente todas as probabilidades resultantes, gerando a distribuição completa de mensagens possíveis.  
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \textbf{Uso do gene}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \textbf{Uso de pcataList}
 
 O catamorfismo |pcataList| percorre a lista de palavras de forma recursiva, aplicando a função |gene| a cada passo. Esta abordagem permite separar a lógica de percorrer a lista da lógica de transmissão probabilística, tornando o comportamento do aparelho mais fácil de modelar. Sabendo a declaração de |pcataList| (dada no enunciado):
