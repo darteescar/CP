@@ -872,17 +872,23 @@ O comportamento local do aparelho é descrito por um |gene|, que define as decis
 
 Antes de apresentar a solução completa, é útil analisar cada componente que será usado.
 
-\textbf{Uso do pcataList}
+\textbf{Uso de Dist}
 
-O catamorfismo |pcataList| percorre a lista de palavras de forma recursiva, aplicando a função |gene| a cada passo. Esta abordagem permite separar a lógica de percorrer a lista, da lógica de transmissão probabilística, tornando o comportamento do aparelho mais fácil de modelar. Sabendo a declaração de |pcataList|:
+\textbf{Uso do gene}
+
+\textbf{Uso de pcataList}
+
+O catamorfismo |pcataList| percorre a lista de palavras de forma recursiva, aplicando a função |gene| a cada passo. Esta abordagem permite separar a lógica de percorrer a lista da lógica de transmissão probabilística, tornando o comportamento do aparelho mais fácil de modelar. Sabendo a declaração de |pcataList| (dada no enunciado):
+
 \begin{center}
 \begin{code}
 pcataList :: (Either () (a, b) -> Dist b) -> [a] -> Dist b
 \end{code}
 \end{center}
 
-E que em listas, os catamorfismos devem ter em conta os casos de lista vazia e não vazia, é possível deduzir a definição de |pcataList| como sendo:
+E que em listas os catamorfismos devem ter em conta os casos de lista vazia e não vazia, é possível deduzir a definição de |pcataList| como sendo:
 
+\begin{center}
 \begin{code}
 pcataList :: (Either () (a, b) -> Dist b) -> [a] -> Dist b
 pcataList gene []     = gene (Left ())
@@ -890,31 +896,29 @@ pcataList gene (x:xs) = do
     y <- pcataList gene xs
     gene (Right (x, y))
 \end{code}
+\end{center}
 
 Nesta definição:
 
 \begin{itemize}
     \item No caso de lista vazia, |gene| recebe |Left ()|, permitindo decidir probabilisticamente se o processo termina.
-    \item No caso de lista não vazia, a cauda da lista é processada primeiro recursivamente, produzindo |y|, que é então combinado com a cabeça |x| através de |gene (Right (x, y))|. 
+    \item No caso de lista não vazia, a cauda da lista é processada primeiro recursivamente, produzindo $y$, que é então combinado com a cabeça $x$ através de |gene (Right (x, y))|.
 \end{itemize}
 
 Para ilustrar o seu funcionamento, considere a mensagem:
-
 \begin{center}
 ["hi","bye"]
 \end{center}
 
+
 O |pcataList| processa a lista recursivamente da seguinte forma:
 
-1. Processa a cauda: primeiro aplica-se \texttt{pcataList gene} à cauda da lista, neste caso ["bye"]. Isto produzuma distribuição de todas as possíveis mensagens resultantes da cauda, considerando as escolhas probabilísticas do . Chamemos esse resultado de |Y=pcataList gene ["bye"]|.
+\begin{enumerate}
+    \item \textbf{Processa a cauda:} primeiro aplica-se |pcataList gene| à cauda da lista, neste caso ["bye"]. Isto produz uma distribuição de todas as possíveis mensagens resultantes da cauda, considerando as escolhas probabilísticas do \texttt{gene}. Chamemos esse resultado de $Y = pcataList~gene~["bye"]$.
+    
+    \item \textbf{Combina com a cabeça:} para cada possível resultado $y \in Y$, aplica-se |gene| à cabeça "hi" junto com $y$, ou seja, calcula-se \texttt{gene (Right ("hi", y))}. Este passo combina o efeito probabilístico da cabeça com todos os resultados possíveis da cauda.
+\end{enumerate}
 
-\item 2. Combina com a cabeça: para cada possível resultado  $y \in Y$
-𝑦
-∈
-𝑌
-y∈Y, aplica-se \texttt{gene} à cabeça "hi" junto com 
-𝑦
-y, ou seja, calcula-se \texttt{gene (Right ("hi", y))}. Este passo combina o efeito probabilístico da cabeça com todos os resultados possíveis da cauda.
 
 
 
