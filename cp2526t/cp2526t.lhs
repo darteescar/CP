@@ -860,10 +860,62 @@ fair_merge' = anaStream undefined
 
 \subsection*{Problema 4}
 
+\subsection*{Problema 4}
+
+\textbf{Introdução}
+
+De uma forma simples, o objetivo deste problema é desenhar uma função |transmitir| que descreve o comportamento de um aparelho de telegrafia avariado. Esse aparelho tenta transmitir uma mensagem palavra a palavra, mas pode falhar de forma aleatória: cada palavra pode perder-se durante a transmissão e, no final da mensagem, o envio do código "stop" também pode falhar.
+
+Pretende-se que a função |transmitir| modele corretamente estas falhas, produzindo todas as mensagens possíveis, cada uma associada à respetiva probabilidade. Para tal, recorre-se a um catamorfismo probabilístico sobre listas, |pcataList|, cujo resultado é uma distribuição de probabilidades, representada pelo mónade |Dist|.
+
+O comportamento local do aparelho é descrito por um |gene|, que define as decisões probabilísticas a tomar em cada passo da transmissão. A função |transmitir = pcataList gene| separa assim o mecanismo genérico de percorrer a lista, do comportamento específico do aparelho.
+
+Antes de apresentar a solução completa, é útil analisar cada componente que será usado.
+
+\textbf{Uso do pcataList}
+
+O catamorfismo |pcataList| percorre a lista de palavras de forma recursiva, aplicando a função |gene| a cada passo. Esta abordagem permite separar a lógica de percorrer a lista, da lógica de transmissão probabilística, tornando o comportamento do aparelho mais fácil de modelar. Sabendo a declaração de |pcataList|:
+\begin{center}
 \begin{code}
-pcataList = undefined
-gene = undefined
+pcataList :: (Either () (a, b) -> Dist b) -> [a] -> Dist b
 \end{code}
+\end{center}
+
+E que em listas, os catamorfismos devem ter em conta os casos de lista vazia e não vazia, é possível deduzir a definição de |pcataList| como sendo:
+
+\begin{code}
+pcataList :: (Either () (a, b) -> Dist b) -> [a] -> Dist b
+pcataList gene []     = gene (Left ())
+pcataList gene (x:xs) = do
+    y <- pcataList gene xs
+    gene (Right (x, y))
+\end{code}
+
+Nesta definição:
+
+\begin{itemize}
+    \item No caso de lista vazia, |gene| recebe |Left ()|, permitindo decidir probabilisticamente se o processo termina.
+    \item No caso de lista não vazia, a cauda da lista é processada primeiro recursivamente, produzindo |y|, que é então combinado com a cabeça |x| através de |gene (Right (x, y))|. 
+\end{itemize}
+
+Para ilustrar o seu funcionamento, considere a mensagem:
+
+\begin{center}
+["hi","bye"]
+\end{center}
+
+O |pcataList| processa a lista recursivamente da seguinte forma:
+
+1. Processa a cauda: primeiro aplica-se \texttt{pcataList gene} à cauda da lista, neste caso ["bye"]. Isto produzuma distribuição de todas as possíveis mensagens resultantes da cauda, considerando as escolhas probabilísticas do . Chamemos esse resultado de |Y=pcataList gene ["bye"]|.
+
+\item 2. Combina com a cabeça: para cada possível resultado  $y \in Y$
+𝑦
+∈
+𝑌
+y∈Y, aplica-se \texttt{gene} à cabeça "hi" junto com 
+𝑦
+y, ou seja, calcula-se \texttt{gene (Right ("hi", y))}. Este passo combina o efeito probabilístico da cabeça com todos os resultados possíveis da cauda.
+
 
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%
