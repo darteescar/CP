@@ -677,7 +677,7 @@ a aplicação de |levels| à árvore |t1|, por exemplo, resulta na lista de list
 \end{spec}
 
 Para depois obter a travessia |bforder|, basta concatenar todas as listas internas, o que é feito
-pela função |concat|, já na função |bfsLevels|.
+na função |bfsLevels| com recurso à função |concat|.
 
 O desafio aqui está em encontrar o gene (|glevels|) do catamorfismo |levels|. 
 Para começar, podemos representar esse catamorfismo através do seguinte diagrama:
@@ -710,9 +710,9 @@ a aplicação de |levels| às subárvores esquerda e direita de |t1| resulta, re
 [[3],[1,4]] e [[7],[6,8]]
 \end{spec}
 
-Neste caso o passo final seria colocar o valor da raiz |5| (|[5]|) no início da lista, 
+Neste caso o passo final seria colocar o valor da raiz |5| (|[5]|) no início da lista final, 
 e depois juntar as listas dos níveis das subárvores esquerda e direita,
-o que se faz com a função |zipWith (++)|, que concatena as listas correspondentes de duas listas de listas.
+o que se pode fazer com a função |zipWith (++)|, que concatena as listas correspondentes de duas listas de listas.
 
 Desta forma o comportamento do gene |glevels| pode ser representado por este diagrama:
 
@@ -727,7 +727,7 @@ Desta forma o comportamento do gene |glevels| pode ser representado por este dia
                \ar[ur]^-{|nil|}
                \ar[r]_-{|i1|}
      &
-          |1 + A >< (Seq((Seq A)) >< Seq((Seq A)))|
+          |1 + A >< (Seq((Seq A))><Seq((Seq A)))|
                \ar[u]^-{|either nil f|}
      &
           |A >< (Seq((Seq A)) >< Seq((Seq A)))|
@@ -742,19 +742,46 @@ Assim sendo o código que define o gene |glevels| é o seguinte:
 \begin{code}
 glevels :: Either () (a, ([[a]],[[a]])) -> [[a]]
 glevels = either nil f
-     where f(root, (l,r)) = [root] : zipWith (++) l r
+     where f(a, (l,r)) = [a] : zipWith (++) l r
 \end{code}
 
 Tal como descrito anteriormente, |f| coloca o valor da raiz à cabeça da lista,
 seguido da concatenação das listas dos níveis das subárvores esquerda e direita,
-com a função |zipWith (++)|.
+com a função |zipWith (++)| do \emph{Prelude}. Esta função pode ser definida como
+um anamorfismo de listas, estando o diagrama e a definição apresentados a seguir:
 
+\begin{eqnarray*}
+\centerline{
+     \xymatrix@@C=5cm@@R=2cm{
+          |Seq C|
+               \ar@@/^1pc/[r]^-{|outList|}
+     &
+          |1 + C >< Seq C|
+               \ar@@/^1pc/[l]^-{|inList|}
+     \\
+          |Seq A >< Seq B|
+               \ar[u]^-{|anaList geneZW|}
+               \ar@@/_1pc/[r]_-{|geneZW|}
+     &
+          |1 + C >< (Seq A >< Seq B)|
+               \ar[u]_{|id + id >< anaList geneZW|}
+     }
+}
+\end{eqnarray*}
 
-Para a segunda versão proposta para a resolução do \textbf{Problema 1}, pretende-se
+\begin{code}
+zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith' f = curry(anaList geneZW) where 
+     geneZW ([],_) = i1 ()
+     geneZW (_,[]) = i1 ()          
+     geneZW ((a:as), (b:bs)) = i2 (f a b, (as,bs))
+\end{code}
+
+Na segunda versão proposta para a resolução do \textbf{Problema 1}, pretende-se
 usar um anamorfismo de listas para se fazer a travessia \emph{in-order} em regime \emph{breadth-first}.
 
 Com o estudo do artigo \cite{Ok00}, percebemos que é possível fazer a travessia \emph{breadth-first}
-em |BTrees|, usando uma floresta, ao invés de uma árvore, para representar os nós a visitar
+em |BTrees| usando uma floresta para representar os nós a visitar
 (neste caso uma floresta é uma lista de |BTrees|).
 
 A ideia do algoritmo é visitar os nós da floresta, retirando o valor do nó da frente da lista,
@@ -775,7 +802,7 @@ Para representar este algoritmo como um anamorfismo, começamos por desenhar o s
      \\
           |Seq ((BTree A))|
                \ar[u]^-{|anaList geneBF|}
-               \ar@@/_1pc/[r]^-{|geneBF|}
+               \ar@@/_1pc/[r]_-{|geneBF|}
      &
           |1+  A >< Seq ((BTree A))|
                \ar[u]_{|id + id >< anaList geneBF|}
@@ -821,6 +848,8 @@ geneBF (Node (a,(l,r)):t) = i2 (a, t ++ [l,r])
 \end{code}
 
 \subsection*{Problema 2}
+No \textbf{Problema 2}, 
+
 
 \subsection*{Problema 3}
 

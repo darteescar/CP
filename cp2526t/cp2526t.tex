@@ -910,7 +910,7 @@ a aplicação de \ensuremath{\Varid{levels}} à árvore \ensuremath{t_1 }, por e
 \end{hscode}\resethooks
 
 Para depois obter a travessia \ensuremath{\Varid{bforder}}, basta concatenar todas as listas internas, o que é feito
-pela função \ensuremath{\Varid{concat}}, já na função \ensuremath{\Varid{bfsLevels}}.
+na função \ensuremath{\Varid{bfsLevels}} com recurso à função \ensuremath{\Varid{concat}}.
 
 O desafio aqui está em encontrar o gene (\ensuremath{\Varid{glevels}}) do catamorfismo \ensuremath{\Varid{levels}}. 
 Para começar, podemos representar esse catamorfismo através do seguinte diagrama:
@@ -946,9 +946,9 @@ a aplicação de \ensuremath{\Varid{levels}} às subárvores esquerda e direita 
 \ColumnHook
 \end{hscode}\resethooks
 
-Neste caso o passo final seria colocar o valor da raiz \ensuremath{\mathrm{5}} (\ensuremath{[\mskip1.5mu \mathrm{5}\mskip1.5mu]}) no início da lista, 
+Neste caso o passo final seria colocar o valor da raiz \ensuremath{\mathrm{5}} (\ensuremath{[\mskip1.5mu \mathrm{5}\mskip1.5mu]}) no início da lista final, 
 e depois juntar as listas dos níveis das subárvores esquerda e direita,
-o que se faz com a função \ensuremath{\Varid{zipWith}\;(\mathbin{+\!\!+})}, que concatena as listas correspondentes de duas listas de listas.
+o que se pode fazer com a função \ensuremath{\Varid{zipWith}\;(\mathbin{+\!\!+})}, que concatena as listas correspondentes de duas listas de listas.
 
 Desta forma o comportamento do gene \ensuremath{\Varid{glevels}} pode ser representado por este diagrama:
 
@@ -984,20 +984,58 @@ Assim sendo o código que define o gene \ensuremath{\Varid{glevels}} é o seguin
 \>[B]{}\Varid{glevels}\mathrel{=}\alt{\Varid{nil}}{\Varid{f}}{}\<[E]%
 \\
 \>[B]{}\hsindent{6}{}\<[6]%
-\>[6]{}\mathbf{where}\;\Varid{f}\;(\Varid{root},(\Varid{l},\Varid{r}))\mathrel{=}[\mskip1.5mu \Varid{root}\mskip1.5mu]\mathbin{:}\Varid{zipWith}\;(\mathbin{+\!\!+})\;\Varid{l}\;\Varid{r}{}\<[E]%
+\>[6]{}\mathbf{where}\;\Varid{f}\;(\Varid{a},(\Varid{l},\Varid{r}))\mathrel{=}[\mskip1.5mu \Varid{a}\mskip1.5mu]\mathbin{:}\Varid{zipWith}\;(\mathbin{+\!\!+})\;\Varid{l}\;\Varid{r}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
 Tal como descrito anteriormente, \ensuremath{\Varid{f}} coloca o valor da raiz à cabeça da lista,
 seguido da concatenação das listas dos níveis das subárvores esquerda e direita,
-com a função \ensuremath{\Varid{zipWith}\;(\mathbin{+\!\!+})}.
+com a função \ensuremath{\Varid{zipWith}\;(\mathbin{+\!\!+})} do \emph{Prelude}. Esta função pode ser definida como
+um anamorfismo de listas, estando o diagrama e a definição apresentados a seguir:
 
+\begin{eqnarray*}
+\centerline{
+     \xymatrix@C=5cm@R=2cm{
+          \ensuremath{{\mathit C}^{*}}
+               \ar@/^1pc/[r]^-{\ensuremath{\Varid{outList}}}
+     &
+          \ensuremath{\mathrm{1}\mathbin{+}\mathit C\times{\mathit C}^{*}}
+               \ar@/^1pc/[l]^-{\ensuremath{\Varid{inList}}}
+     \\
+          \ensuremath{{\Conid{A}}^{*}\times{\mathit B}^{*}}
+               \ar[u]^-{\ensuremath{\anaList{\Varid{geneZW}}}}
+               \ar@/_1pc/[r]_-{\ensuremath{\Varid{geneZW}}}
+     &
+          \ensuremath{\mathrm{1}\mathbin{+}\mathit C\times({\Conid{A}}^{*}\times{\mathit B}^{*})}
+               \ar[u]_{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\anaList{\Varid{geneZW}}}}
+     }
+}
+\end{eqnarray*}
 
-Para a segunda versão proposta para a resolução do \textbf{Problema 1}, pretende-se
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{6}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{zipWith'}\mathbin{::}(\Varid{a}\to \Varid{b}\to \Varid{c})\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{b}\mskip1.5mu]\to [\mskip1.5mu \Varid{c}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{zipWith'}\;\Varid{f}\mathrel{=}\overline{\anaList{\Varid{geneZW}}}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\Varid{geneZW}\;([\mskip1.5mu \mskip1.5mu],\anonymous )\mathrel{=}i_1\;(){}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\Varid{geneZW}\;(\anonymous ,[\mskip1.5mu \mskip1.5mu])\mathrel{=}i_1\;(){}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\Varid{geneZW}\;((\Varid{a}\mathbin{:}\Varid{as}),(\Varid{b}\mathbin{:}\Varid{bs}))\mathrel{=}i_2\;(\Varid{f}\;\Varid{a}\;\Varid{b},(\Varid{as},\Varid{bs})){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Na segunda versão proposta para a resolução do \textbf{Problema 1}, pretende-se
 usar um anamorfismo de listas para se fazer a travessia \emph{in-order} em regime \emph{breadth-first}.
 
 Com o estudo do artigo \cite{Ok00}, percebemos que é possível fazer a travessia \emph{breadth-first}
-em \ensuremath{\Conid{BTrees}}, usando uma floresta, ao invés de uma árvore, para representar os nós a visitar
+em \ensuremath{\Conid{BTrees}} usando uma floresta para representar os nós a visitar
 (neste caso uma floresta é uma lista de \ensuremath{\Conid{BTrees}}).
 
 A ideia do algoritmo é visitar os nós da floresta, retirando o valor do nó da frente da lista,
@@ -1018,7 +1056,7 @@ Para representar este algoritmo como um anamorfismo, começamos por desenhar o s
      \\
           \ensuremath{{(\Conid{BTree}\;\Conid{A})}^{*}}
                \ar[u]^-{\ensuremath{\anaList{\Varid{geneBF}}}}
-               \ar@/_1pc/[r]^-{\ensuremath{\Varid{geneBF}}}
+               \ar@/_1pc/[r]_-{\ensuremath{\Varid{geneBF}}}
      &
           \ensuremath{\mathrm{1}\mathbin{+}\Conid{A}\times{(\Conid{BTree}\;\Conid{A})}^{*}}
                \ar[u]_{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\anaList{\Varid{geneBF}}}}
@@ -1073,6 +1111,8 @@ O anamorfismo repete este processo até que a floresta esteja vazia.
 \end{hscode}\resethooks
 
 \subsection*{Problema 2}
+No \textbf{Problema 2}, 
+
 
 \subsection*{Problema 3}
 
