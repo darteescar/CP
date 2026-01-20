@@ -665,6 +665,8 @@ que sejam necessárias.
 \textbf{Importante}: Não pode ser alterado o texto deste ficheiro fora deste anexo.
 
 \subsection*{Problema 1}
+\textbf{Catamorfismo}
+
 Na primeira versão proposta para a resolução do \textbf{Problema 1}, pretende-se
 usar um catamorfismo de |BTrees| para se fazer a travessia \emph{in-order} em regime \emph{breadth-first}.
 
@@ -771,7 +773,7 @@ podemos esquematizar o lado direito da solução desta forma:
 
 \begin{eqnarray*}
 \centerline{
-\xymatrix@@R=1.5cm{
+\xymatrix@@R=1cm{
    |Seq A >< (Seq((Seq A)) >< Seq((Seq A)))|
       \ar[d]^-{|singl >< juntaListas|} 
 \\
@@ -787,6 +789,8 @@ Logo a definição de |glevels| é a seguinte:
 \begin{code}
 glevels' = either nil (cons . (singl >< juntaListas))
 \end{code}
+
+\textbf{Anamorfismo}
 
 Na segunda versão proposta para a resolução do \textbf{Problema 1}, pretende-se
 usar um anamorfismo de listas para se fazer a travessia \emph{in-order} em regime \emph{breadth-first}.

@@ -895,6 +895,8 @@ que sejam necessárias.
 \textbf{Importante}: Não pode ser alterado o texto deste ficheiro fora deste anexo.
 
 \subsection*{Problema 1}
+\textbf{Catamorfismo}
+
 Na primeira versão proposta para a resolução do \textbf{Problema 1}, pretende-se
 usar um catamorfismo de \ensuremath{\Conid{BTrees}} para se fazer a travessia \emph{in-order} em regime \emph{breadth-first}.
 
@@ -1026,7 +1028,7 @@ podemos esquematizar o lado direito da solução desta forma:
 
 \begin{eqnarray*}
 \centerline{
-\xymatrix@R=1.5cm{
+\xymatrix@R=1cm{
    \ensuremath{{\Conid{A}}^{*}\times({({\Conid{A}}^{*})}^{*}\times{({\Conid{A}}^{*})}^{*})}
       \ar[d]^-{\ensuremath{\Varid{singl}\times\Varid{juntaListas}}} 
 \\
@@ -1045,6 +1047,8 @@ Logo a definição de \ensuremath{\Varid{glevels}} é a seguinte:
 \>[B]{}\Varid{glevels'}\mathrel{=}\alt{\Varid{nil}}{\Varid{cons}\comp (\Varid{singl}\times\Varid{juntaListas})}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+\textbf{Anamorfismo}
 
 Na segunda versão proposta para a resolução do \textbf{Problema 1}, pretende-se
 usar um anamorfismo de listas para se fazer a travessia \emph{in-order} em regime \emph{breadth-first}.
