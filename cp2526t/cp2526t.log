@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.1.19)  20 JAN 2026 15:40
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.1.19)  20 JAN 2026 15:54
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1539,16 +1539,16 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 
 \openout7 = `cp2526t.ptb'.
 
+\openout7 = `cp2526t.ptb'.
+
+\openout7 = `cp2526t.ptb'.
+
 
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
 [14]
-\openout7 = `cp2526t.ptb'.
-
-\openout7 = `cp2526t.ptb'.
-
 \openout7 = `cp2526t.ptb'.
 
  (./cp2526t.ind
@@ -1615,7 +1615,7 @@ ve/texmf-dist/fonts/type1/public/stmaryrd/stmary10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/stmaryrd/stmary9.pfb></usr/share/texlive/texmf-dist/f
 onts/type1/public/xypic/xyatip10.pfb></usr/share/texlive/texmf-dist/fonts/type1
 /public/xypic/xybtip10.pfb>
-Output written on cp2526t.pdf (18 pages, 1096274 bytes).
+Output written on cp2526t.pdf (18 pages, 1095917 bytes).
 PDF statistics:
  373 PDF objects out of 1000 (max. 8388607)
  296 compressed objects within 3 object streams

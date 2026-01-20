@@ -1258,20 +1258,11 @@ O tipo do \ensuremath{\Varid{gene}} é:
 O uso do \ensuremath{\cdot +\cdot } permite separar de forma natural os dois casos distintos que surgem ao percorrer uma lista:
 
 \begin{itemize}
-    \item \textbf{Lista vazia:} representada por \ensuremath{i_1\;()}. Este caso corresponde ao fim da lista, permitindo ao \ensuremath{\Varid{gene}} decidir probabilisticamente se a transmissão termina corretamente ou se ocorre a falha de envio do "stop". 
-    \item \textbf{Lista não vazia:} representada por \ensuremath{i_2\;(\Conid{String},[\mskip1.5mu \Conid{String}\mskip1.5mu])}, onde $x$ é a cabeça da lista (palavra atual) e $y$ é o resultado já processado da cauda. Este caso permite ao \ensuremath{\Varid{gene}} combinar a palavra atual com todos os resultados possíveis da cauda, aplicando as regras probabilísticas definidas.
+    \item \textbf{Lista vazia:} representada por \ensuremath{i_1\;()}. Este caso corresponde ao fim da lista, permitindo decidir probabilisticamente se a transmissão termina corretamente ou se ocorre a falha de envio do "stop". 
+    \item \textbf{Lista não vazia:} representada por \ensuremath{i_2\;(\Conid{String},[\mskip1.5mu \Conid{String}\mskip1.5mu])}, onde $x$ é a cabeça da lista (palavra atual) e $y$ é o resultado já processado da cauda. Este caso permite combinar a palavra atual com todos os resultados possíveis da cauda, aplicando as regras probabilísticas definidas.
 \end{itemize}
 
-Desta forma, o \ensuremath{\Varid{gene}} consegue tratar de forma modular e uniforme tanto o caso base da lista, quanto a transmissão de cada palavra individual, sem que a função de percorrer a lista (\ensuremath{\Varid{pcataList}}) precise de conhecer detalhes do comportamento probabilístico.
-
-O \ensuremath{\Varid{gene}} é útil porque:
-
-\begin{itemize}
-    \item Separa o comportamento local do aparelho da recursão da lista, permitindo alterar as probabilidades ou regras sem modificar \ensuremath{\Varid{pcataList}}.
-    \item Permite modelar decisões probabilísticas complexas, incluindo múltiplas opções para cada palavra ou eventos condicionais.
-    \item Quando combinado com \ensuremath{\Varid{pcataList}} e o mónade \ensuremath{\fun{Dist}}, propaga automaticamente todas as probabilidades e combinações possíveis, garantindo que o resultado final contenha a distribuição completa de mensagens.
-\end{itemize}
-
+Desta forma, o \ensuremath{\Varid{gene}} consegue tratar de forma modular e uniforme tanto o caso base da lista, quanto a transmissão de cada palavra individual, sem que a função de percorrer a lista (\ensuremath{\Varid{pcataList}}) precise de conhecer detalhes do comportamento probabilístico como: as probabilidades definidas ou possíveis decisões probabilísticas complexas (por exemplo, múltiplas opções para cada palavra ou eventos condicionais).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

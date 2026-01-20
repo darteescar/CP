@@ -947,9 +947,9 @@ No nosso projeto, é necessário modelar a transmissão de mensagens em que cada
 O mónade Dist faz exatamente isso:
 
 \begin{center}
-\begin{code}
+\begin{spec}
 newtype Dist a = D { unD :: [(a, ProbRep)] }
-\end{code}
+\end{spec}
 \end{center}
 
 \begin{itemize}
@@ -994,20 +994,11 @@ gene :: Either () (String, [String]) -> Dist [String]
 O uso do |Either| permite separar de forma natural os dois casos distintos que surgem ao percorrer uma lista:
 
 \begin{itemize}
-    \item \textbf{Lista vazia:} representada por |Left ()|. Este caso corresponde ao fim da lista, permitindo ao |gene| decidir probabilisticamente se a transmissão termina corretamente ou se ocorre a falha de envio do "stop". 
-    \item \textbf{Lista não vazia:} representada por |Right (String, [String])|, onde $x$ é a cabeça da lista (palavra atual) e $y$ é o resultado já processado da cauda. Este caso permite ao |gene| combinar a palavra atual com todos os resultados possíveis da cauda, aplicando as regras probabilísticas definidas.
+    \item \textbf{Lista vazia:} representada por |Left ()|. Este caso corresponde ao fim da lista, permitindo decidir probabilisticamente se a transmissão termina corretamente ou se ocorre a falha de envio do "stop". 
+    \item \textbf{Lista não vazia:} representada por |Right (String, [String])|, onde $x$ é a cabeça da lista (palavra atual) e $y$ é o resultado já processado da cauda. Este caso permite combinar a palavra atual com todos os resultados possíveis da cauda, aplicando as regras probabilísticas definidas.
 \end{itemize}
 
-Desta forma, o |gene| consegue tratar de forma modular e uniforme tanto o caso base da lista, quanto a transmissão de cada palavra individual, sem que a função de percorrer a lista (|pcataList|) precise de conhecer detalhes do comportamento probabilístico.
-
-O |gene| é útil porque:
-
-\begin{itemize}
-    \item Separa o comportamento local do aparelho da recursão da lista, permitindo alterar as probabilidades ou regras sem modificar |pcataList|.
-    \item Permite modelar decisões probabilísticas complexas, incluindo múltiplas opções para cada palavra ou eventos condicionais.
-    \item Quando combinado com |pcataList| e o mónade |Dist|, propaga automaticamente todas as probabilidades e combinações possíveis, garantindo que o resultado final contenha a distribuição completa de mensagens.
-\end{itemize}
-
+Desta forma, o |gene| consegue tratar de forma modular e uniforme tanto o caso base da lista, quanto a transmissão de cada palavra individual, sem que a função de percorrer a lista (|pcataList|) precise de conhecer detalhes do comportamento probabilístico como: as probabilidades definidas ou possíveis decisões probabilísticas complexas (por exemplo, múltiplas opções para cada palavra ou eventos condicionais).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1026,13 +1017,13 @@ pcataList :: (Either () (a, b) -> Dist b) -> [a] -> Dist b
 E que em listas os catamorfismos devem ter em conta os casos de lista vazia e não vazia, é possível deduzir a definição de |pcataList| como sendo:
 
 \begin{center}
-\begin{spec}
+\begin{code}
 pcataList :: (Either () (a, b) -> Dist b) -> [a] -> Dist b
 pcataList gene []     = gene (Left ())
 pcataList gene (x:xs) = do
     y <- pcataList gene xs
     gene (Right (x, y))
-\end{spec}
+\end{code}
 \end{center}
 
 Nesta definição:
