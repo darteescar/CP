@@ -665,6 +665,8 @@ que sejam necessárias.
 \textbf{Importante}: Não pode ser alterado o texto deste ficheiro fora deste anexo.
 
 \subsection*{Problema 1}
+\textbf{Catamorfismo}
+
 Na primeira versão proposta para a resolução do \textbf{Problema 1}, pretende-se
 usar um catamorfismo de |BTrees| para se fazer a travessia \emph{in-order} em regime \emph{breadth-first}.
 
@@ -771,7 +773,7 @@ podemos esquematizar o lado direito da solução desta forma:
 
 \begin{eqnarray*}
 \centerline{
-\xymatrix@@R=1.5cm{
+\xymatrix@@R=1cm{
    |Seq A >< (Seq((Seq A)) >< Seq((Seq A)))|
       \ar[d]^-{|singl >< juntaListas|} 
 \\
@@ -787,6 +789,8 @@ Logo a definição de |glevels| é a seguinte:
 \begin{code}
 glevels' = either nil (cons . (singl >< juntaListas))
 \end{code}
+
+\textbf{Anamorfismo}
 
 Na segunda versão proposta para a resolução do \textbf{Problema 1}, pretende-se
 usar um anamorfismo de listas para se fazer a travessia \emph{in-order} em regime \emph{breadth-first}.
@@ -895,14 +899,28 @@ Tal como pedido no enunciado, vamos começar por derivar a lei dual da recursivi
 
 Fica então demonstrada a lei dual da recursividade mútua.
 
+A partir da definição do tipo |Stream| e da função |outStream|, é possível 
+deduzir que o functor |fF| associado a |Stream| é o seguinte,
 
+\begin{spec}
+fF X = A >< X
+fF g = id >< g
+\end{spec}
 
+já que uma |Stream A| é decomposta num par com o primeiro elemento de um tipo qualquer |A| e o resto da |Stream A|.
+
+Tendo isto em conta, e sabendo que a função |fair_merge'| que queremos definir como um anamorfismo de |Streams| 
+é do tipo
+\begin{code} 
+fair_merge' :: Either (Stream A, Stream A) (Stream A, Stream A) -> Stream A 
+\end{code}
+podemos representar o anamorfismo |fair_merge'| através do seguinte diagrama:
 
 \begin{eqnarray*}
 \centerline{
-     \xymatrix@@C=2cm@@R=2cm{
+     \xymatrix@@C=1.5cm@@R=3.5cm{
           |Stream A|
-               \ar[r]^-{|outBTree|}
+               \ar[r]^-{|outStream|}
      &
           |A >< Stream A|
      \\
@@ -914,19 +932,53 @@ Fica então demonstrada a lei dual da recursividade mútua.
                \ar[u]_{|fF (anaStream geneFM) = id >< anaStream geneFM|}
      }
 }
-\end{eqnarray*} 
+\end{eqnarray*}
 
+Com a análise deste diagrama, e do comportamento da função |fair_merge| definida 
+de forma mutuamente recursiva na formulação do problema neste enunciado
+\begin{spec}
+fair_merge :: Either (Stream a, Stream a) (Stream a, Stream a) -> Stream a
+fair_merge = either h k where
+   h (Cons(x,xs), y) = Cons(x , k(xs,y))
+   k (x, Cons(y,ys)) = Cons(y , h(x,ys))
+\end{spec}
 
+conseguimos definir |fair_merge'| como um anamorfismo de |Streams|
+\begin{code}
+fair_merge' = anaStream geneFM
+\end{code}
 
-
-
-
-
-
+onde o gene |geneFM| é definido como:
 
 \begin{code}
-fair_merge' = anaStream undefined
+geneFM :: Either (Stream a, Stream a) (Stream a, Stream a) -> a >< (Either (Stream a, Stream a) (Stream a, Stream a))
+geneFM i1(Cons(x,xs), y) = (x, i2(xs, y))
+geneFM i2(x, Cons(y,ys)) = (y, i1(x, ys))
 \end{code}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \subsection*{Problema 4}
 

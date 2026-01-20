@@ -895,6 +895,8 @@ que sejam necessárias.
 \textbf{Importante}: Não pode ser alterado o texto deste ficheiro fora deste anexo.
 
 \subsection*{Problema 1}
+\textbf{Catamorfismo}
+
 Na primeira versão proposta para a resolução do \textbf{Problema 1}, pretende-se
 usar um catamorfismo de \ensuremath{\Conid{BTrees}} para se fazer a travessia \emph{in-order} em regime \emph{breadth-first}.
 
@@ -1026,7 +1028,7 @@ podemos esquematizar o lado direito da solução desta forma:
 
 \begin{eqnarray*}
 \centerline{
-\xymatrix@R=1.5cm{
+\xymatrix@R=1cm{
    \ensuremath{{\Conid{A}}^{*}\times({({\Conid{A}}^{*})}^{*}\times{({\Conid{A}}^{*})}^{*})}
       \ar[d]^-{\ensuremath{\Varid{singl}\times\Varid{juntaListas}}} 
 \\
@@ -1045,6 +1047,8 @@ Logo a definição de \ensuremath{\Varid{glevels}} é a seguinte:
 \>[B]{}\Varid{glevels'}\mathrel{=}\alt{\Varid{nil}}{\Varid{cons}\comp (\Varid{singl}\times\Varid{juntaListas})}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+\textbf{Anamorfismo}
 
 Na segunda versão proposta para a resolução do \textbf{Problema 1}, pretende-se
 usar um anamorfismo de listas para se fazer a travessia \emph{in-order} em regime \emph{breadth-first}.
@@ -1150,14 +1154,35 @@ Tal como pedido no enunciado, vamos começar por derivar a lei dual da recursivi
 
 Fica então demonstrada a lei dual da recursividade mútua.
 
+A partir da definição do tipo \ensuremath{\Conid{Stream}} e da função \ensuremath{\mathsf{out}}, é possível 
+deduzir que o functor \ensuremath{\fun F } associado a \ensuremath{\Conid{Stream}} é o seguinte,
 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\fun F \;\Conid{X}\mathrel{=}\Conid{A}\times\Conid{X}{}\<[E]%
+\\
+\>[B]{}\fun F \;\Varid{g}\mathrel{=}\Varid{id}\times\Varid{g}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
 
+já que uma \ensuremath{\Conid{Stream}\;\Conid{A}} é decomposta num par com o primeiro elemento de um tipo qualquer \ensuremath{\Conid{A}} e o resto da \ensuremath{\Conid{Stream}\;\Conid{A}}.
+
+Tendo isto em conta, e sabendo que a função \ensuremath{\Varid{fair\char95 merge'}} que queremos definir como um anamorfismo de \ensuremath{\Conid{Streams}} 
+é do tipo
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{fair\char95 merge'}\mathbin{::}(\Conid{Stream}\;\Conid{A},\Conid{Stream}\;\Conid{A})+(\Conid{Stream}\;\Conid{A},\Conid{Stream}\;\Conid{A})\to \Conid{Stream}\;\Conid{A}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+podemos representar o anamorfismo \ensuremath{\Varid{fair\char95 merge'}} através do seguinte diagrama:
 
 \begin{eqnarray*}
 \centerline{
-     \xymatrix@C=2cm@R=2cm{
+     \xymatrix@C=1.5cm@R=3.5cm{
           \ensuremath{\Conid{Stream}\;\Conid{A}}
-               \ar[r]^-{\ensuremath{\Varid{outBTree}}}
+               \ar[r]^-{\ensuremath{\mathsf{out}}}
      &
           \ensuremath{\Conid{A}\times\Conid{Stream}\;\Conid{A}}
      \\
@@ -1169,22 +1194,70 @@ Fica então demonstrada a lei dual da recursividade mútua.
                \ar[u]_{\ensuremath{\fun F \;\lanabracket\,\Varid{geneFM}\,\ranabracket\mathrel{=}\Varid{id}\times\lanabracket\,\Varid{geneFM}\,\ranabracket}}
      }
 }
-\end{eqnarray*} 
+\end{eqnarray*}
 
+Com a análise deste diagrama, e do comportamento da função \ensuremath{\Varid{fair\char95 merge}} definida 
+de forma mutuamente recursiva na formulação do problema neste enunciado
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{4}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{fair\char95 merge}\mathbin{::}(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})+(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})\to \Conid{Stream}\;\Varid{a}{}\<[E]%
+\\
+\>[B]{}\Varid{fair\char95 merge}\mathrel{=}\alt{\Varid{h}}{\Varid{k}}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{4}{}\<[4]%
+\>[4]{}\Varid{h}\;(\Conid{Cons}\;(\Varid{x},\Varid{xs}),\Varid{y})\mathrel{=}\Conid{Cons}\;(\Varid{x},\Varid{k}\;(\Varid{xs},\Varid{y})){}\<[E]%
+\\
+\>[B]{}\hsindent{4}{}\<[4]%
+\>[4]{}\Varid{k}\;(\Varid{x},\Conid{Cons}\;(\Varid{y},\Varid{ys}))\mathrel{=}\Conid{Cons}\;(\Varid{y},\Varid{h}\;(\Varid{x},\Varid{ys})){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
 
+conseguimos definir \ensuremath{\Varid{fair\char95 merge'}} como um anamorfismo de \ensuremath{\Conid{Streams}}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{fair\char95 merge'}\mathrel{=}\lanabracket\,\Varid{geneFM}\,\ranabracket{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
 
-
-
-
-
-
+onde o gene \ensuremath{\Varid{geneFM}} é definido como:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{fair\char95 merge'}\mathrel{=}\lanabracket\,\bot \,\ranabracket{}\<[E]%
+\>[B]{}\Varid{geneFM}\mathbin{::}(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})+(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})\to \Varid{a}\times((\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})+(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})){}\<[E]%
+\\
+\>[B]{}\Varid{geneFM}\;i_1\;(\Conid{Cons}\;(\Varid{x},\Varid{xs}),\Varid{y})\mathrel{=}(\Varid{x},i_2\;(\Varid{xs},\Varid{y})){}\<[E]%
+\\
+\>[B]{}\Varid{geneFM}\;i_2\;(\Varid{x},\Conid{Cons}\;(\Varid{y},\Varid{ys}))\mathrel{=}(\Varid{y},i_1\;(\Varid{x},\Varid{ys})){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 \subsection*{Problema 4}
 

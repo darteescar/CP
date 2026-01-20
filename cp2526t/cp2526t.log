@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.1.19)  20 JAN 2026 16:38
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.12.30)  20 JAN 2026 15:55
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1452,11 +1452,9 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 \openout7 = `cp2526t.ptb'.
 
  <xymatrix 2x2 256>
-Overfull \hbox (20.0pt too wide) in alignment at lines 918--935
+Overfull \hbox (20.0pt too wide) in alignment at lines 920--937
  [][][] []
  []
-
-\openout7 = `cp2526t.ptb'.
 
 \openout7 = `cp2526t.ptb'.
 
@@ -1470,15 +1468,17 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 
 \openout7 = `cp2526t.ptb'.
 
+\openout7 = `cp2526t.ptb'.
+
  <xymatrix 3x2 246>
-Overfull \hbox (20.0pt too wide) in alignment at lines 983--1002
+Overfull \hbox (20.0pt too wide) in alignment at lines 985--1004
  [][][] []
  []
 
 \openout7 = `cp2526t.ptb'.
 
 <xymatrix 1x3 102>
-Overfull \hbox (20.0pt too wide) in alignment at lines 1027--1039
+Overfull \hbox (20.0pt too wide) in alignment at lines 1029--1041
  [][][] []
  []
 
@@ -1490,12 +1490,12 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  []
 
 [10] <xymatrix 2x2 256>
-Overfull \hbox (20.0pt too wide) in alignment at lines 1063--1080
+Overfull \hbox (20.0pt too wide) in alignment at lines 1067--1084
  [][][] []
  []
 
 <xymatrix 2x1 54>
-Overfull \hbox (20.0pt too wide) in alignment at lines 1087--1096
+Overfull \hbox (20.0pt too wide) in alignment at lines 1091--1100
  [][][] []
  []
 
@@ -1508,8 +1508,13 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[11] <xymatrix 2x2 198>
-Overfull \hbox (20.0pt too wide) in alignment at lines 1156--1172
+[11]
+\openout7 = `cp2526t.ptb'.
+
+\openout7 = `cp2526t.ptb'.
+
+ <xymatrix 2x2 198>
+Overfull \hbox (20.0pt too wide) in alignment at lines 1181--1197
  [][][] []
  []
 
@@ -1522,6 +1527,23 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 
 [12]
 \openout7 = `cp2526t.ptb'.
+
+\openout7 = `cp2526t.ptb'.
+
+
+Overfull \hbox (41.34712pt too wide) in paragraph at lines 1227--1236
+ [][] 
+ []
+
+
+Overfull \hbox (41.34712pt too wide) in paragraph at lines 1227--1236
+ [][] 
+ []
+
+
+Overfull \hbox (41.34712pt too wide) in paragraph at lines 1227--1236
+ [][] 
+ []
 
 \openout7 = `cp2526t.ptb'.
 
