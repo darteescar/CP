@@ -1162,7 +1162,7 @@ corresponde a uma única distribuição final que contém todas as mensagens pos
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \textbf{Definição de gene}
 
-Depois de analisarmos os três componentes principais desta solução — o mónade |Dist|, o comportamento encapsulado pelo |gene| e o catamorfismo |pcataList| —, a definição do |gene| torna-se natural.
+Depois de analisados os três componentes principais desta solução — o mónade |Dist|, o comportamento encapsulado pelo |gene| e o catamorfismo |pcataList| —, a definição do |gene| torna-se natural.
 
 \begin{itemize}
 

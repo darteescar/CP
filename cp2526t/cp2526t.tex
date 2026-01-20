@@ -1377,8 +1377,6 @@ E que em listas, os catamorfismos devem ter em conta os casos de lista vazia e n
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{23}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{pcataList}\mathbin{::}(()+(\Varid{a},\Varid{b})\to \fun{Dist}\;\Varid{b})\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \fun{Dist}\;\Varid{b}{}\<[E]%
-\\
 \>[B]{}\Varid{pcataList}\;\Varid{gene}\;[\mskip1.5mu \mskip1.5mu]{}\<[23]%
 \>[23]{}\mathrel{=}\Varid{gene}\;(i_1\;()){}\<[E]%
 \\
@@ -1497,12 +1495,12 @@ corresponde a uma única distribuição final que contém todas as mensagens pos
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \textbf{Definição de gene}
 
-Depois de analisarmos os três componentes principais desta solução — o mónade \ensuremath{\fun{Dist}}, o comportamento encapsulado pelo \ensuremath{\Varid{gene}} e o catamorfismo \ensuremath{\Varid{pcataList}} —, a definição do \ensuremath{\Varid{gene}} torna-se natural.
+Depois de analisados os três componentes principais desta solução — o mónade \ensuremath{\fun{Dist}}, o comportamento encapsulado pelo \ensuremath{\Varid{gene}} e o catamorfismo \ensuremath{\Varid{pcataList}} —, a definição do \ensuremath{\Varid{gene}} torna-se natural.
 
 \begin{itemize}
 
 \item Para o caso da lista ser vazia (\ensuremath{i_1\;()}), que corresponde ao fim da transmissão, podemos definir uma probabilidade de 90\% de enviar corretamente a palavra final "stop" e de 10\% de falhar.
-\item Para o caso da lista não ser vazia (\ensuremath{i_2\;(\Varid{x},\Varid{y})}), cada palavra $x$ tem uma probabilidade de 95\% de ser transmitida, enquanto os restantes 5\% representam a perda da palavra.
+\item Para o caso da lista não ser vazia (\ensuremath{i_2\;(\Varid{x},\Varid{y})}), cada palavra $x$ tem uma probabilidade de 95\% de ser transmitida, enquanto que os restantes 5\% representam a perda da palavra.
 
 \end{itemize}
 
@@ -1517,7 +1515,7 @@ Assim, fica-se com:
 \\
 \>[B]{}\Varid{gene}\;(i_1\;())\mathrel{=}\Conid{D}\;[\mskip1.5mu ([\mskip1.5mu \text{\ttfamily \char34 stop\char34}\mskip1.5mu],\mathrm{0.9}),([\mskip1.5mu \mskip1.5mu],\mathrm{0.1})\mskip1.5mu]{}\<[E]%
 \\
-\>[B]{}\Varid{gene}\;(i_2\;(\Varid{x},\Varid{ys}))\mathrel{=}\Conid{D}\;[\mskip1.5mu (\Varid{x}\mathbin{:}\Varid{ys},\mathrm{0.95}),\Varid{ys},\mathrm{0.05}\mskip1.5mu]{}\<[E]%
+\>[B]{}\Varid{gene}\;(i_2\;(\Varid{x},\Varid{ys}))\mathrel{=}\Conid{D}\;[\mskip1.5mu (\Varid{x}\mathbin{:}\Varid{ys},\mathrm{0.95}),(\Varid{ys},\mathrm{0.05})\mskip1.5mu]{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 \end{center}
