@@ -989,34 +989,110 @@ Tem-se:
 Para que estas equações sejam verdadeiras, é necessário encontrar |g1| e |g2|
 tais que as igualdades se verifiquem.
 
+Vamos definir |g1| e |g2| como:
 
+\begin{spec}
+g1(Cons(x,xs), y) = (x, Right (xs, y))
 
+g2(x, Cons(y,ys)) = (y, Left (x, ys))
+\end{spec}
 
+Para a primeira equação, temos:
+\begin{eqnarray*}
+\start
+\just\equiv{ Igualdade extensional }
+|
+     outStream . h (Cons(x,xs), y) 
+|
+\just\equiv{ Def-comp }
+|
+     outStream (h (Cons(x,xs), y))
+|
+\just\equiv{ Def-h }
+|
+     outStream (Cons(x , k(xs,y)))
+|
+\just\equiv{ Def-out }
+|
+     (x , k(xs,y))
+|
+\just\equiv{ Def-x, Cancelamento-+ }
+|
+     (id >< either h k) (x, Right (xs, y))
+|
+\just\equiv{ Def-g1 }
+|
+     (id >< either h k) . g1 (Cons(x,xs), y)
+|
+\qed
+\end{eqnarray*}
 
+O mesmo aplica-se para a segunda equação:
+\begin{eqnarray*}
+\start
+\just\equiv{ Igualdade extensional }
+|
+     outStream . k (x, Cons(y,ys)) 
+|
+\just\equiv{ Def-comp }
+|
+     outStream (k (x, Cons(y,ys)))
+|
+\just\equiv{ Def-k }
+|
+     outStream (Cons(y , h(x,ys)))
+|
+\just\equiv{ Def-out }
+|
+     (y , h(x,ys))
+|
+\just\equiv{ Def-x, Cancelamento-+ }
+|
+     (id >< either h k) (y, Left (x, ys)) 
+|
+\just\equiv{ Def-g2 }
+|
+     (id >< either h k) . g2 (x, Cons(y,ys))
+|
+\qed
+\end{eqnarray*}
 
+Com isto fica demonstrado que |fair_merge| se pode definir como um
+anamorfismo de |Streams|, ou seja, |fair_merge = anaStream geneFM|,
+para o gene |geneFM| definido como |either g1 g2|.
 
+Para testar a função |fair_merge'|, definimos a seguinte
+função auxiliar |takeStream| que permite extrair os primeiros |n| elementos
+de uma |Stream| e devolvê-los como uma lista.
 
+\begin{code}
+takeStream :: Int -> Stream a -> [a]
+takeStream 0 _ = []
+takeStream n (Cons (x,xs)) = x : takeStream (n-1) xs
+\end{code}
 
+Definimos também as seguintes |Streams| de exemplo:
 
+\begin{code}
+s1 :: Stream Int
+s1 = Cons(1, Cons(3, Cons(5, Cons(7, Cons(9, s1)))))
+s2 :: Stream Int
+s2 = Cons(2, Cons(4, Cons(6, Cons(8, Cons(10, s2)))))
+\end{code}
 
+A aplicação de |takeStream 10 (fair_merge' (Left (s1,s2)))| resulta na lista:
+\begin{spec}
+[1,2,3,4,5,6,7,8,9,10]
+\end{spec}
+refletindo a intercalção justa dos elementos das duas |Streams|, 
+começando pela primeira.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+A aplicação de |takeStream 10 (fair_merge' (Right (s1,s2)))| resulta na lista:
+\begin{spec}
+[2,1,4,3,6,5,8,7,10,9]
+\end{spec}
+refletindo a intercalção justa dos elementos das duas |Streams|, 
+começando pela segunda.
 \subsection*{Problema 4}
 
 \textbf{Introdução}

@@ -1263,32 +1263,109 @@ Tem-se:
 \qed
 \end{eqnarray*}
 
+Para que estas equações sejam verdadeiras, é necessário encontrar \ensuremath{\Varid{g1}} e \ensuremath{\Varid{g2}}
+tais que as igualdades se verifiquem.
 
+Vamos definir \ensuremath{\Varid{g1}} e \ensuremath{\Varid{g2}} como:
 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{g1}\;(\Conid{Cons}\;(\Varid{x},\Varid{xs}),\Varid{y})\mathrel{=}(\Varid{x},i_2\;(\Varid{xs},\Varid{y})){}\<[E]%
+\\[\blanklineskip]%
+\>[B]{}\Varid{g2}\;(\Varid{x},\Conid{Cons}\;(\Varid{y},\Varid{ys}))\mathrel{=}(\Varid{y},i_1\;(\Varid{x},\Varid{ys})){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
 
+Para a primeira equação, temos:
+\begin{eqnarray*}
+\start
+\just\equiv{ Igualdade extensional }
+\ensuremath{\mathsf{out}\comp \Varid{h}\;(\Conid{Cons}\;(\Varid{x},\Varid{xs}),\Varid{y})}
+\just\equiv{ Def-comp }
+\ensuremath{\mathsf{out}\;(\Varid{h}\;(\Conid{Cons}\;(\Varid{x},\Varid{xs}),\Varid{y}))}
+\just\equiv{ Def-h }
+\ensuremath{\mathsf{out}\;(\Conid{Cons}\;(\Varid{x},\Varid{k}\;(\Varid{xs},\Varid{y})))}
+\just\equiv{ Def-out }
+\ensuremath{(\Varid{x},\Varid{k}\;(\Varid{xs},\Varid{y}))}
+\just\equiv{ Def-x, Cancelamento-+ }
+\ensuremath{(\Varid{id}\times\alt{\Varid{h}}{\Varid{k}})\;(\Varid{x},i_2\;(\Varid{xs},\Varid{y}))}
+\just\equiv{ Def-g1 }
+\ensuremath{(\Varid{id}\times\alt{\Varid{h}}{\Varid{k}})\comp \Varid{g1}\;(\Conid{Cons}\;(\Varid{x},\Varid{xs}),\Varid{y})}
+\qed
+\end{eqnarray*}
 
+O mesmo aplica-se para a segunda equação:
+\begin{eqnarray*}
+\start
+\just\equiv{ Igualdade extensional }
+\ensuremath{\mathsf{out}\comp \Varid{k}\;(\Varid{x},\Conid{Cons}\;(\Varid{y},\Varid{ys}))}
+\just\equiv{ Def-comp }
+\ensuremath{\mathsf{out}\;(\Varid{k}\;(\Varid{x},\Conid{Cons}\;(\Varid{y},\Varid{ys})))}
+\just\equiv{ Def-k }
+\ensuremath{\mathsf{out}\;(\Conid{Cons}\;(\Varid{y},\Varid{h}\;(\Varid{x},\Varid{ys})))}
+\just\equiv{ Def-out }
+\ensuremath{(\Varid{y},\Varid{h}\;(\Varid{x},\Varid{ys}))}
+\just\equiv{ Def-x, Cancelamento-+ }
+\ensuremath{(\Varid{id}\times\alt{\Varid{h}}{\Varid{k}})\;(\Varid{y},i_1\;(\Varid{x},\Varid{ys}))}
+\just\equiv{ Def-g2 }
+\ensuremath{(\Varid{id}\times\alt{\Varid{h}}{\Varid{k}})\comp \Varid{g2}\;(\Varid{x},\Conid{Cons}\;(\Varid{y},\Varid{ys}))}
+\qed
+\end{eqnarray*}
 
+Com isto fica demonstrado que \ensuremath{\Varid{fair\char95 merge}} se pode definir como um
+anamorfismo de \ensuremath{\Conid{Streams}}, ou seja, \ensuremath{\Varid{fair\char95 merge}\mathrel{=}\lanabracket\,\Varid{geneFM}\,\ranabracket},
+para o gene \ensuremath{\Varid{geneFM}} definido como \ensuremath{\alt{\Varid{g1}}{\Varid{g2}}}.
 
+Para testar a função \ensuremath{\Varid{fair\char95 merge'}}, definimos a seguinte
+função auxiliar \ensuremath{\Varid{takeStream}} que permite extrair os primeiros \ensuremath{\Varid{n}} elementos
+de uma \ensuremath{\Conid{Stream}} e devolvê-los como uma lista.
 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{takeStream}\mathbin{::}\Conid{Int}\to \Conid{Stream}\;\Varid{a}\to [\mskip1.5mu \Varid{a}\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{takeStream}\;\mathrm{0}\;\anonymous \mathrel{=}[\mskip1.5mu \mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{takeStream}\;\Varid{n}\;(\Conid{Cons}\;(\Varid{x},\Varid{xs}))\mathrel{=}\Varid{x}\mathbin{:}\Varid{takeStream}\;(\Varid{n}\mathbin{-}\mathrm{1})\;\Varid{xs}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
 
+Definimos também as seguintes \ensuremath{\Conid{Streams}} de exemplo:
 
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{s1}\mathbin{::}\Conid{Stream}\;\Conid{Int}{}\<[E]%
+\\
+\>[B]{}\Varid{s1}\mathrel{=}\Conid{Cons}\;(\mathrm{1},\Conid{Cons}\;(\mathrm{3},\Conid{Cons}\;(\mathrm{5},\Conid{Cons}\;(\mathrm{7},\Conid{Cons}\;(\mathrm{9},\Varid{s1}))))){}\<[E]%
+\\
+\>[B]{}\Varid{s2}\mathbin{::}\Conid{Stream}\;\Conid{Int}{}\<[E]%
+\\
+\>[B]{}\Varid{s2}\mathrel{=}\Conid{Cons}\;(\mathrm{2},\Conid{Cons}\;(\mathrm{4},\Conid{Cons}\;(\mathrm{6},\Conid{Cons}\;(\mathrm{8},\Conid{Cons}\;(\mathrm{10},\Varid{s2}))))){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
 
+A aplicação de \ensuremath{\Varid{takeStream}\;\mathrm{10}\;(\Varid{fair\char95 merge'}\;(i_1\;(\Varid{s1},\Varid{s2})))} resulta na lista:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}[\mskip1.5mu \mathrm{1},\mathrm{2},\mathrm{3},\mathrm{4},\mathrm{5},\mathrm{6},\mathrm{7},\mathrm{8},\mathrm{9},\mathrm{10}\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+refletindo a intercalção justa dos elementos das duas \ensuremath{\Conid{Streams}}, 
+começando pela primeira.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+A aplicação de \ensuremath{\Varid{takeStream}\;\mathrm{10}\;(\Varid{fair\char95 merge'}\;(i_2\;(\Varid{s1},\Varid{s2})))} resulta na lista:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}[\mskip1.5mu \mathrm{2},\mathrm{1},\mathrm{4},\mathrm{3},\mathrm{6},\mathrm{5},\mathrm{8},\mathrm{7},\mathrm{10},\mathrm{9}\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+refletindo a intercalção justa dos elementos das duas \ensuremath{\Conid{Streams}}, 
+começando pela segunda.
 \subsection*{Problema 4}
 
 \textbf{Introdução}
