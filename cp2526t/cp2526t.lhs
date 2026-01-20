@@ -1025,13 +1025,13 @@ De uma forma simples, o objetivo deste problema é desenhar uma função |transm
 
 Pretende-se que a função |transmitir| modele corretamente estas falhas, produzindo todas as mensagens possíveis, cada uma associada à respetiva probabilidade. Para tal, recorre-se a um catamorfismo probabilístico sobre listas, |pcataList|, cujo resultado é uma distribuição de probabilidades, representada pelo mónade Dist.
 
-O comportamento local do aparelho é descrito por um |gene|, que define as decisões probabilísticas a tomar em cada passo da transmissão. A função |transmitir = pcataList gene| separa assim o mecanismo genérico de percorrer a lista, do comportamento específico do aparelho.
+O comportamento local do aparelho é descrito por um |gene|, que define as decisões probabilísticas a tomar em cada passo da transmissão. A função |transmitir = pcataList gene| separa, assim, o mecanismo genérico de percorrer a lista, do comportamento específico do aparelho.
 
-Antes de apresentar a solução completa, é útil analisar cada componente que será usado.
+Antes de apresentar a solução completa, achamos útil analisar cada componente que será usado para que, de seguida, a definição do gene seja mais intuitiva de deduzir e possa ser aplicada para verificar a solução para o problema proposto.
 
 \textbf{Uso de Dist}
 
-No nosso projeto, é necessário modelar a transmissão de mensagens em que cada palavra pode falhar de forma aleatória. Para isso, precisamos de uma forma de representar todas as mensagens possíveis e associar a cada uma a sua probabilidade de ocorrência.
+No nosso projeto, é necessário modelar a transmissão de mensagens, em que cada palavra pode falhar de forma aleatória. Para isso, precisamos de uma forma de representar todas as mensagens possíveis e associar a cada uma a sua probabilidade de ocorrência.
 
 O mónade Dist faz exatamente isso:
 
@@ -1050,9 +1050,24 @@ Dist forma um mónade porque:
 
 \begin{center}
 \begin{itemize}
-    \item Tem uma operação return: |return a = D [(a,1)]|, que gera uma distribuição determinística com probabilidade 1.  
-    \item Tem uma composição de Kleisli (bind >>=): $(f \bullet g)~a = [(y,q*p) \mid (x,p) \leftarrow g~a, (y,q) \leftarrow f~x]$,  
-    onde $g :: A \to \texttt{Dist B}$ e $f :: B \to \texttt{Dist C}$ são funções que representam computações probabilísticas.  
+     \item Tem uma operação return: |return a = D [(a,1)]|, que gera uma distribuição determinística com probabilidade 1.  
+     \item Tem uma composição de Kleisli (bind >>=): 
+     \begin{center}
+     $(f \bullet g)~a = [(y,q*p) \mid (x,p) \leftarrow g~a, (y,q) \leftarrow f~x]$,  
+     \end{center}
+     onde 
+     
+     \begin{center}
+     $g :: A \to \texttt{Dist B}$ 
+     \end{center}
+
+     e 
+
+     \begin{center}
+     $f :: B \to \texttt{Dist C}$ 
+     \end{center}
+    
+     são funções que representam computações probabilísticas.  
 \end{itemize}
 \end{center}
 
@@ -1062,17 +1077,17 @@ possíveis de palavras transmitidas e perdidas, multiplicando as probabilidades 
 sem necessidade de ciclos explícitos ou cálculos manuais.
 
 Desta forma, alterações no comportamento do |gene| propagam-se corretamente por toda a lista,
-sendo suficiente ajustar apenas as probabilidades associadas a cada decisão local.
+sendo suficiente ajustar apenas as probabilidades associadas a cada decisão.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\textbf{Uso do gene}
+\textbf{Uso de gene}
 
-O |gene| descreve o comportamento local do aparelho de telegrafia. Para cada palavra, define quais são os resultados que podem ocorrer e com que probabilidades. Neste caso, deverá calcular o caso da perda de uma palavra ou o caso da perda da palavra final "stop".
+O |gene| deverá descrever o comportamento local do aparelho de telegrafia. Para cada palavra, define quais são os resultados que podem ocorrer e com que probabilidades. Neste caso, deverá calcular o caso da perda de uma palavra ou o caso da perda da palavra final "stop".
 
-O tipo do |gene| é:
+Pode-se afirmar que o tipo do |gene| é:
 
 \begin{center}
 \begin{spec}
@@ -1080,11 +1095,11 @@ gene :: Either () (String, [String]) -> Dist [String]
 \end{spec}
 \end{center}
 
-O uso do |Either| permite separar de forma natural os dois casos distintos que surgem ao percorrer uma lista:
+Já que o uso do |Either| permite separar de forma natural os dois casos distintos que surgem ao percorrer uma lista:
 
 \begin{itemize}
-    \item \textbf{Lista vazia:} representada por |Left ()|. Este caso corresponde ao fim da lista, permitindo decidir probabilisticamente se a transmissão termina corretamente ou se ocorre a falha de envio do "stop". 
-    \item \textbf{Lista não vazia:} representada por |Right (String, [String])|, onde $x$ é a cabeça da lista (palavra atual) e $y$ é o resultado já processado da cauda. Este caso permite combinar a palavra atual com todos os resultados possíveis da cauda, aplicando as regras probabilísticas definidas.
+    \item \textbf{Lista vazia:} representada por |Left ()|. Este caso corresponde ao fim da lista, permitindo decidir probabilisticamente se a transmissão termina corretamente ou se ocorre a falha de envio de "stop". 
+    \item \textbf{Lista não vazia:} representada por |Right (x, y)|, onde $x$ é a cabeça da lista (palavra atual) e $y$ é o resultado já processado da cauda. Este caso permite combinar a palavra atual com todos os resultados possíveis da cauda, aplicando as regras probabilísticas definidas.
 \end{itemize}
 
 Desta forma, o |gene| consegue tratar de forma modular e uniforme tanto o caso base da lista, quanto a transmissão de cada palavra individual, sem que a função de percorrer a lista (|pcataList|) precise de conhecer detalhes do comportamento probabilístico como: as probabilidades definidas ou possíveis decisões probabilísticas complexas (por exemplo, múltiplas opções para cada palavra ou eventos condicionais).
@@ -1095,7 +1110,7 @@ Desta forma, o |gene| consegue tratar de forma modular e uniforme tanto o caso b
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \textbf{Uso de pcataList}
 
-O catamorfismo |pcataList| percorre a lista de palavras de forma recursiva, aplicando a função |gene| a cada passo. Esta abordagem permite separar a lógica de percorrer a lista da lógica de transmissão probabilística, tornando o comportamento do aparelho mais fácil de modelar. Sabendo a declaração de |pcataList| (dada no enunciado):
+O catamorfismo |pcataList| percorre a lista de palavras de forma recursiva, aplicando a função |gene| a cada passo. Esta abordagem permite separar a lógica de percorrer a lista, da lógica de transmissão probabilística, tornando o comportamento do aparelho mais fácil de modelar. Sabendo a declaração de |pcataList| (dada no enunciado):
 
 \begin{center}
 \begin{spec}
@@ -1103,7 +1118,7 @@ pcataList :: (Either () (a, b) -> Dist b) -> [a] -> Dist b
 \end{spec}
 \end{center}
 
-E que em listas os catamorfismos devem ter em conta os casos de lista vazia e não vazia, é possível deduzir a definição de |pcataList| como sendo:
+E que em listas, os catamorfismos devem ter em conta os casos de lista vazia e não vazia, é possível deduzir a definição de |pcataList| como sendo:
 
 \begin{center}
 \begin{code}
@@ -1117,8 +1132,8 @@ pcataList gene (x:xs) = do
 Nesta definição:
 
 \begin{itemize}
-    \item No caso de lista vazia, |gene| recebe |Left ()|, permitindo decidir probabilisticamente se o processo termina.
-    \item No caso de lista não vazia, a cauda da lista é processada primeiro recursivamente, produzindo $y$, que é então combinado com a cabeça $x$ através de |gene (Right (x, y))|.
+    \item No caso da lista ser vazia, |gene| recebe |Left ()|, permitindo decidir probabilisticamente se o processo termina.
+    \item No caso da lista não ser vazia, a cauda da lista é processada primeiro recursivamente, produzindo $y$, que é então combinado com a cabeça $x$ através de |gene (Right (x, y))|.
 \end{itemize}
 
 Para ilustrar o seu funcionamento, considere a mensagem:
@@ -1132,9 +1147,9 @@ A aplicação de |pcataList gene| a esta lista é definida recursivamente, segui
      \item \textbf{Passo 1: lista completa ["hi","hi again","bye"]}  
      \begin{center}
      \begin{spec}
-     pcataList gene ["hi","hi again","bye"] = do {
+     pcataList gene ["hi","hi again","bye"] = do 
         y <- pcataList gene ["hi again","bye"];
-        gene (Right ("hi", y))}
+        gene (Right ("hi", y))
      \end{spec}
      \end{center}
     O valor $y$ representa uma distribuição de todos os resultados possíveis da cauda ["hi again","bye"].
@@ -1177,6 +1192,61 @@ pcataList gene ["hi","hi again","bye"]
 \end{center}
 
 corresponde a uma única distribuição final que contém todas as mensagens possíveis resultantes da transmissão, já com as probabilidades corretamente combinadas.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\textbf{Definição de gene}
+
+Depois de analisados os três componentes principais desta solução — o mónade |Dist|, o comportamento encapsulado pelo |gene| e o catamorfismo |pcataList| —, a definição do |gene| torna-se natural.
+
+\begin{itemize}
+
+\item Para o caso da lista ser vazia (|Left ()|), que corresponde ao fim da transmissão, podemos definir uma probabilidade de 90\% de enviar corretamente a palavra final "stop" e de 10\% de falhar.
+\item Para o caso da lista não ser vazia (|Right (x, y)|), cada palavra $x$ tem uma probabilidade de 95\% de ser transmitida, enquanto que os restantes 5\% representam a perda da palavra.
+
+\end{itemize}
+
+Assim, fica-se com:
+
+
+\begin{center}
+\begin{code}
+gene :: Either () (String, [String]) -> Dist [String]
+gene (Left ()) = D [(["stop"], 0.9), ([], 0.1)]
+gene (Right (x, ys)) = D [(x:ys, 0.95), (ys, 0.05)]
+\end{code}
+\end{center}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
