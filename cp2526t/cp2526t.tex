@@ -1126,14 +1126,128 @@ No \textbf{Problema 2},
 
 \subsection*{Problema 4}
 
+\subsection*{Problema 4}
+
+\textbf{Introdução}
+
+De uma forma simples, o objetivo deste problema é desenhar uma função \ensuremath{\Varid{transmitir}} que descreve o comportamento de um aparelho de telegrafia avariado. Esse aparelho tenta transmitir uma mensagem palavra a palavra, mas pode falhar de forma aleatória: cada palavra pode perder-se durante a transmissão e, no final da mensagem, o envio do código "stop" também pode falhar.
+
+Pretende-se que a função \ensuremath{\Varid{transmitir}} modele corretamente estas falhas, produzindo todas as mensagens possíveis, cada uma associada à respetiva probabilidade. Para tal, recorre-se a um catamorfismo probabilístico sobre listas, \ensuremath{\Varid{pcataList}}, cujo resultado é uma distribuição de probabilidades, representada pelo mónade \ensuremath{\fun{Dist}}.
+
+O comportamento local do aparelho é descrito por um \ensuremath{\Varid{gene}}, que define as decisões probabilísticas a tomar em cada passo da transmissão. A função \ensuremath{\Varid{transmitir}\mathrel{=}\Varid{pcataList}\;\Varid{gene}} separa assim o mecanismo genérico de percorrer a lista, do comportamento específico do aparelho.
+
+Antes de apresentar a solução completa, é útil analisar cada componente que será usado.
+
+\textbf{Uso de Dist}
+
+No nosso projeto, é necessário modelar a transmissão de mensagens em que cada palavra pode falhar de forma aleatória. Para isso, precisamos de uma forma de representar todas as mensagens possíveis e associar a cada uma a sua probabilidade de ocorrência.
+
+O mónade \ensuremath{\fun{Dist}} faz exatamente isso:
+
+\begin{center}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{pcataList}\mathrel{=}\bot {}\<[E]%
-\\
-\>[B]{}\Varid{gene}\mathrel{=}\bot {}\<[E]%
+\>[B]{}\mathbf{newtype}\;\fun{Dist}\;\Varid{a}\mathrel{=}\Conid{D}\;\{\mskip1.5mu \Varid{unD}\mathbin{::}[\mskip1.5mu (\Varid{a},\Conid{ProbRep})\mskip1.5mu]\mskip1.5mu\}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+\end{center}
+
+\begin{itemize}
+     \item Cada a é um possível valor (no nosso caso, uma mensagem ou palavra transmitida).
+     \item Cada ProbRep é a probabilidade desse valor ocorrer (um número real entre 0 e 1, somando 1 no total).
+\end{itemize}
+
+
+\ensuremath{\fun{Dist}} forma um mónade porque:
+
+\begin{center}
+\begin{itemize}
+    \item Tem uma operação return: \ensuremath{\Varid{return}\;\Varid{a}\mathrel{=}\Conid{D}\;[\mskip1.5mu (\Varid{a},\mathrm{1})\mskip1.5mu]}, que gera uma distribuição determinística com probabilidade 1.  
+    \item Tem uma composição de Kleisli (bind >>=): $(f \bullet g)~a = [(y,q*p) \mid (x,p) \leftarrow g~a, (y,q) \leftarrow f~x]$,  
+    onde $g :: A \to \texttt{Dist B}$ e $f :: B \to \texttt{Dist C}$ são funções que representam computações probabilísticas.  
+\end{itemize}
+\end{center}
+
+Esta definição permite combinar automaticamente as probabilidades de múltiplas etapas de cálculo. Por exemplo, ao percorrer uma lista de palavras, o mónade \ensuremath{\fun{Dist}} calcula todas as combinações possíveis de palavras transmitidas e perdidas, multiplicando as probabilidades de cada passo sem necessidade de loops ou cálculos manuais. Assim, alterações no comportamento do \ensuremath{\Varid{gene}} propagam-se corretamente em toda a lista, sem haver necessidade de mudar nada mais do que as probabilidades definidas.
+
+No contexto do nosso problema, o mónade \ensuremath{\fun{Dist}} é particularmente útil porque permite que a função \ensuremath{\Varid{pcataList}}:
+
+\begin{itemize}
+    \item percorra a lista de palavras,  
+    \item aplique probabilisticamente o \ensuremath{\Varid{gene}} a cada elemento, e  
+    \item combine corretamente todas as probabilidades resultantes, gerando a distribuição completa de mensagens possíveis.  
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\textbf{Uso do gene}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\textbf{Uso de pcataList}
+
+O catamorfismo \ensuremath{\Varid{pcataList}} percorre a lista de palavras de forma recursiva, aplicando a função \ensuremath{\Varid{gene}} a cada passo. Esta abordagem permite separar a lógica de percorrer a lista da lógica de transmissão probabilística, tornando o comportamento do aparelho mais fácil de modelar. Sabendo a declaração de \ensuremath{\Varid{pcataList}} (dada no enunciado):
+
+\begin{center}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{pcataList}\mathbin{::}(()+(\Varid{a},\Varid{b})\to \fun{Dist}\;\Varid{b})\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \fun{Dist}\;\Varid{b}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{center}
+
+E que em listas os catamorfismos devem ter em conta os casos de lista vazia e não vazia, é possível deduzir a definição de \ensuremath{\Varid{pcataList}} como sendo:
+
+\begin{center}
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{5}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{23}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{pcataList}\mathbin{::}(()+(\Varid{a},\Varid{b})\to \fun{Dist}\;\Varid{b})\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \fun{Dist}\;\Varid{b}{}\<[E]%
+\\
+\>[B]{}\Varid{pcataList}\;\Varid{gene}\;[\mskip1.5mu \mskip1.5mu]{}\<[23]%
+\>[23]{}\mathrel{=}\Varid{gene}\;(i_1\;()){}\<[E]%
+\\
+\>[B]{}\Varid{pcataList}\;\Varid{gene}\;(\Varid{x}\mathbin{:}\Varid{xs})\mathrel{=}\mathbf{do}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\Varid{y}\leftarrow \Varid{pcataList}\;\Varid{gene}\;\Varid{xs}{}\<[E]%
+\\
+\>[B]{}\hsindent{5}{}\<[5]%
+\>[5]{}\Varid{gene}\;(i_2\;(\Varid{x},\Varid{y})){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+\end{center}
+
+Nesta definição:
+
+\begin{itemize}
+    \item No caso de lista vazia, \ensuremath{\Varid{gene}} recebe \ensuremath{i_1\;()}, permitindo decidir probabilisticamente se o processo termina.
+    \item No caso de lista não vazia, a cauda da lista é processada primeiro recursivamente, produzindo $y$, que é então combinado com a cabeça $x$ através de \ensuremath{\Varid{gene}\;(i_2\;(\Varid{x},\Varid{y}))}.
+\end{itemize}
+
+Para ilustrar o seu funcionamento, considere a mensagem:
+\begin{center}
+["hi","bye"]
+\end{center}
+
+
+O \ensuremath{\Varid{pcataList}} processa a lista recursivamente da seguinte forma:
+
+\begin{enumerate}
+    \item \textbf{Processa a cauda:} primeiro aplica-se \ensuremath{\Varid{pcataList}\;\Varid{gene}} à cauda da lista, neste caso ["bye"]. Isto produz uma distribuição de todas as possíveis mensagens resultantes da cauda, considerando as escolhas probabilísticas do \texttt{gene}. Chamemos esse resultado de $Y = pcataList~gene~["bye"]$.
+    
+    \item \textbf{Combina com a cabeça:} para cada possível resultado $y \in Y$, aplica-se \ensuremath{\Varid{gene}} à cabeça "hi" junto com $y$, ou seja, calcula-se \texttt{gene (Right ("hi", y))}. Este passo combina o efeito probabilístico da cabeça com todos os resultados possíveis da cauda.
+\end{enumerate}
+
+
 
 
 %----------------- Índice remissivo (exige makeindex) -------------------------%
