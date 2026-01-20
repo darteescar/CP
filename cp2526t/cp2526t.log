@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.12.30)  20 JAN 2026 15:07
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2025.12.30)  20 JAN 2026 15:55
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1508,8 +1508,13 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[11] <xymatrix 2x2 198>
-Overfull \hbox (20.0pt too wide) in alignment at lines 1160--1176
+[11]
+\openout7 = `cp2526t.ptb'.
+
+\openout7 = `cp2526t.ptb'.
+
+ <xymatrix 2x2 198>
+Overfull \hbox (20.0pt too wide) in alignment at lines 1181--1197
  [][][] []
  []
 
@@ -1524,6 +1529,21 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 \openout7 = `cp2526t.ptb'.
 
 \openout7 = `cp2526t.ptb'.
+
+
+Overfull \hbox (41.34712pt too wide) in paragraph at lines 1227--1236
+ [][] 
+ []
+
+
+Overfull \hbox (41.34712pt too wide) in paragraph at lines 1227--1236
+ [][] 
+ []
+
+
+Overfull \hbox (41.34712pt too wide) in paragraph at lines 1227--1236
+ [][] 
+ []
 
 \openout7 = `cp2526t.ptb'.
 
@@ -1541,6 +1561,16 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 
 \openout7 = `cp2526t.ptb'.
 
+
+Overfull \hbox (128.0374pt too wide) has occurred while \output is active
+ [][]| 
+ []
+
+[14]
+\openout7 = `cp2526t.ptb'.
+
+\openout7 = `cp2526t.ptb'.
+
 \openout7 = `cp2526t.ptb'.
 
  (./cp2526t.ind
@@ -1548,7 +1578,7 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[14] [15
+[15] [16
 
 
 ]) (./cp2526t.bbl
@@ -1561,7 +1591,7 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[16
+[17
 
 ] (./cp2526t.aux)
  ***********
@@ -1579,8 +1609,8 @@ Package rerunfilecheck Info: File `cp2526t.out' has not changed.
 (rerunfilecheck)             Checksum: 1D188B8CDF969C53DBC74774FEC30481;1480.
  ) 
 Here is how much of TeX's memory you used:
- 47856 strings out of 476106
- 1047313 string characters out of 5793932
+ 47857 strings out of 476106
+ 1047320 string characters out of 5793932
  1941975 words of memory out of 5000000
  69143 multiletter control sequences out of 15000+600000
  815245 words of font info for 156 fonts, out of 8000000 for 9000
@@ -1607,10 +1637,10 @@ ve/texmf-dist/fonts/type1/public/stmaryrd/stmary10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/stmaryrd/stmary9.pfb></usr/share/texlive/texmf-dist/f
 onts/type1/public/xypic/xyatip10.pfb></usr/share/texlive/texmf-dist/fonts/type1
 /public/xypic/xybtip10.pfb>
-Output written on cp2526t.pdf (17 pages, 1094195 bytes).
+Output written on cp2526t.pdf (18 pages, 1096204 bytes).
 PDF statistics:
- 366 PDF objects out of 1000 (max. 8388607)
- 290 compressed objects within 3 object streams
- 36 named destinations out of 1000 (max. 500000)
+ 373 PDF objects out of 1000 (max. 8388607)
+ 296 compressed objects within 3 object streams
+ 37 named destinations out of 1000 (max. 500000)
  102 words of extra memory for PDF output out of 10000 (max. 10000000)
 
