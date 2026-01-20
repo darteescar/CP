@@ -702,7 +702,7 @@ Para começar, podemos representar esse catamorfismo através do seguinte diagra
 \end{eqnarray*}
 
 A partir deste diagrama, percebemos que o gene do catamorfismo deverá, para obter a tal lista de listas,
-colocar o valor da raiz no início da lista, seguido das listas dos níveis das subárvores esquerda e direita.
+colocar o valor da raiz no início da lista final, seguido das listas dos níveis das subárvores esquerda e direita.
 Contudo essas listas dos níveis das subárvores estão também organizadas por níveis, ou seja,
 a primeira lista corresponde ao nível 1, a segunda ao nível 2, etc. No caso da àrvore |t1|, por exemplo,
 a aplicação de |levels| às subárvores esquerda e direita de |t1| resulta, respectivamente, nas listas de listas:
@@ -710,11 +710,27 @@ a aplicação de |levels| às subárvores esquerda e direita de |t1| resulta, re
 [[3],[1,4]] e [[7],[6,8]]
 \end{spec}
 
-Neste caso o passo final seria colocar o valor da raiz |5| (|[5]|) no início da lista final, 
-e depois juntar as listas dos níveis das subárvores esquerda e direita,
-o que se pode fazer com a função |zipWith (++)|, que concatena as listas correspondentes de duas listas de listas.
+Neste caso o passo final seria juntar as listas dos níveis das subárvores esquerda e direita, 
+e colocar o valor da raiz |5| (|[5]|) no início da lista final. Para juntar as listas 
+dos níveis das subárvores esquerda e direita, podemos definir a seguinte função auxiliar:
 
-Desta forma o comportamento do gene |glevels| pode ser representado por este diagrama:
+\begin{code}
+juntaListas :: ([[a]] , [[a]]) -> [[a]]
+juntaListas (l,[]) = l
+juntaListas ([],r) = r
+juntaListas ((a:as),(b:bs)) = (a ++ b) : juntaListas (as, bs) 
+\end{code}
+
+Para o exemplo da árvore |t1|, a aplicação de |juntaListas| às listas de listas
+\begin{spec}
+[[3],[1,4]] e [[7],[6,8]]
+\end{spec}
+resulta na lista de listas:
+\begin{spec}
+[[3,7],[1,4,6,8]]
+\end{spec}
+
+Assim sendo, o comportamento do gene |glevels| pode ser representado por este diagrama:
 
 \begin{eqnarray*}
 \centerline{
@@ -737,44 +753,39 @@ Desta forma o comportamento do gene |glevels| pode ser representado por este dia
 }
 \end{eqnarray*}
 
-Assim sendo o código que define o gene |glevels| é o seguinte:
+E o código que define o gene |glevels| é o seguinte:
 
 \begin{code}
 glevels :: Either () (a, ([[a]],[[a]])) -> [[a]]
 glevels = either nil f
-     where f(a, (l,r)) = [a] : zipWith (++) l r
+     where f(a, (l,r)) = [a] : juntaListas (l,r)
 \end{code}
 
 Tal como descrito anteriormente, |f| coloca o valor da raiz à cabeça da lista,
 seguido da concatenação das listas dos níveis das subárvores esquerda e direita,
-com a função |zipWith (++)| do \emph{Prelude}. Esta função pode ser definida como
-um anamorfismo de listas, estando o diagrama e a definição apresentados a seguir:
+com a função |juntaListas|.
+
+Se quisermos definir |glevels| numa versão completamente |pointfree|, 
+podemos esquematizar o lado direito da solução desta forma:
+
 
 \begin{eqnarray*}
 \centerline{
-     \xymatrix@@C=5cm@@R=2cm{
-          |Seq C|
-               \ar@@/^1pc/[r]^-{|outList|}
-     &
-          |1 + C >< Seq C|
-               \ar@@/^1pc/[l]^-{|inList|}
-     \\
-          |Seq A >< Seq B|
-               \ar[u]^-{|anaList geneZW|}
-               \ar@@/_1pc/[r]_-{|geneZW|}
-     &
-          |1 + C >< (Seq A >< Seq B)|
-               \ar[u]_{|id + id >< anaList geneZW|}
-     }
+\xymatrix@@R=1.5cm{
+   |Seq A >< (Seq((Seq A)) >< Seq((Seq A)))|
+      \ar[d]^-{|singl >< juntaListas|} 
+\\
+   |Seq A >< Seq((Seq A))|
+      \ar[d]^-{|cons|}
+\\
+   |Seq((Seq A))|
+}
 }
 \end{eqnarray*}
 
+Logo a definição de |glevels| é a seguinte:
 \begin{code}
-zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]
-zipWith' f = curry(anaList geneZW) where 
-     geneZW ([],_) = i1 ()
-     geneZW (_,[]) = i1 ()          
-     geneZW ((a:as), (b:bs)) = i2 (f a b, (as,bs))
+glevels' = either nil (cons . (singl >< juntaListas))
 \end{code}
 
 Na segunda versão proposta para a resolução do \textbf{Problema 1}, pretende-se

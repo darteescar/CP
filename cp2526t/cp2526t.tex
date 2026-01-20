@@ -935,7 +935,7 @@ Para começar, podemos representar esse catamorfismo através do seguinte diagra
 \end{eqnarray*}
 
 A partir deste diagrama, percebemos que o gene do catamorfismo deverá, para obter a tal lista de listas,
-colocar o valor da raiz no início da lista, seguido das listas dos níveis das subárvores esquerda e direita.
+colocar o valor da raiz no início da lista final, seguido das listas dos níveis das subárvores esquerda e direita.
 Contudo essas listas dos níveis das subárvores estão também organizadas por níveis, ou seja,
 a primeira lista corresponde ao nível 1, a segunda ao nível 2, etc. No caso da àrvore \ensuremath{t_1 }, por exemplo,
 a aplicação de \ensuremath{\Varid{levels}} às subárvores esquerda e direita de \ensuremath{t_1 } resulta, respectivamente, nas listas de listas:
@@ -946,11 +946,39 @@ a aplicação de \ensuremath{\Varid{levels}} às subárvores esquerda e direita 
 \ColumnHook
 \end{hscode}\resethooks
 
-Neste caso o passo final seria colocar o valor da raiz \ensuremath{\mathrm{5}} (\ensuremath{[\mskip1.5mu \mathrm{5}\mskip1.5mu]}) no início da lista final, 
-e depois juntar as listas dos níveis das subárvores esquerda e direita,
-o que se pode fazer com a função \ensuremath{\Varid{zipWith}\;(\mathbin{+\!\!+})}, que concatena as listas correspondentes de duas listas de listas.
+Neste caso o passo final seria juntar as listas dos níveis das subárvores esquerda e direita, 
+e colocar o valor da raiz \ensuremath{\mathrm{5}} (\ensuremath{[\mskip1.5mu \mathrm{5}\mskip1.5mu]}) no início da lista final. Para juntar as listas 
+dos níveis das subárvores esquerda e direita, podemos definir a seguinte função auxiliar:
 
-Desta forma o comportamento do gene \ensuremath{\Varid{glevels}} pode ser representado por este diagrama:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{juntaListas}\mathbin{::}([\mskip1.5mu [\mskip1.5mu \Varid{a}\mskip1.5mu]\mskip1.5mu],[\mskip1.5mu [\mskip1.5mu \Varid{a}\mskip1.5mu]\mskip1.5mu])\to [\mskip1.5mu [\mskip1.5mu \Varid{a}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
+\\
+\>[B]{}\Varid{juntaListas}\;(\Varid{l},[\mskip1.5mu \mskip1.5mu])\mathrel{=}\Varid{l}{}\<[E]%
+\\
+\>[B]{}\Varid{juntaListas}\;([\mskip1.5mu \mskip1.5mu],\Varid{r})\mathrel{=}\Varid{r}{}\<[E]%
+\\
+\>[B]{}\Varid{juntaListas}\;((\Varid{a}\mathbin{:}\Varid{as}),(\Varid{b}\mathbin{:}\Varid{bs}))\mathrel{=}(\Varid{a}\mathbin{+\!\!+}\Varid{b})\mathbin{:}\Varid{juntaListas}\;(\Varid{as},\Varid{bs}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Para o exemplo da árvore \ensuremath{t_1 }, a aplicação de \ensuremath{\Varid{juntaListas}} às listas de listas
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}[\mskip1.5mu [\mskip1.5mu \mathrm{3}\mskip1.5mu],[\mskip1.5mu \mathrm{1},\mathrm{4}\mskip1.5mu]\mskip1.5mu]\;\Varid{e}\;[\mskip1.5mu [\mskip1.5mu \mathrm{7}\mskip1.5mu],[\mskip1.5mu \mathrm{6},\mathrm{8}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+resulta na lista de listas:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}[\mskip1.5mu [\mskip1.5mu \mathrm{3},\mathrm{7}\mskip1.5mu],[\mskip1.5mu \mathrm{1},\mathrm{4},\mathrm{6},\mathrm{8}\mskip1.5mu]\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Assim sendo, o comportamento do gene \ensuremath{\Varid{glevels}} pode ser representado por este diagrama:
 
 \begin{eqnarray*}
 \centerline{
@@ -973,7 +1001,7 @@ Desta forma o comportamento do gene \ensuremath{\Varid{glevels}} pode ser repres
 }
 \end{eqnarray*}
 
-Assim sendo o código que define o gene \ensuremath{\Varid{glevels}} é o seguinte:
+E o código que define o gene \ensuremath{\Varid{glevels}} é o seguinte:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -984,50 +1012,37 @@ Assim sendo o código que define o gene \ensuremath{\Varid{glevels}} é o seguin
 \>[B]{}\Varid{glevels}\mathrel{=}\alt{\Varid{nil}}{\Varid{f}}{}\<[E]%
 \\
 \>[B]{}\hsindent{6}{}\<[6]%
-\>[6]{}\mathbf{where}\;\Varid{f}\;(\Varid{a},(\Varid{l},\Varid{r}))\mathrel{=}[\mskip1.5mu \Varid{a}\mskip1.5mu]\mathbin{:}\Varid{zipWith}\;(\mathbin{+\!\!+})\;\Varid{l}\;\Varid{r}{}\<[E]%
+\>[6]{}\mathbf{where}\;\Varid{f}\;(\Varid{a},(\Varid{l},\Varid{r}))\mathrel{=}[\mskip1.5mu \Varid{a}\mskip1.5mu]\mathbin{:}\Varid{juntaListas}\;(\Varid{l},\Varid{r}){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
 Tal como descrito anteriormente, \ensuremath{\Varid{f}} coloca o valor da raiz à cabeça da lista,
 seguido da concatenação das listas dos níveis das subárvores esquerda e direita,
-com a função \ensuremath{\Varid{zipWith}\;(\mathbin{+\!\!+})} do \emph{Prelude}. Esta função pode ser definida como
-um anamorfismo de listas, estando o diagrama e a definição apresentados a seguir:
+com a função \ensuremath{\Varid{juntaListas}}.
+
+Se quisermos definir \ensuremath{\Varid{glevels}} numa versão completamente \ensuremath{\Varid{pointfree}}, 
+podemos esquematizar o lado direito da solução desta forma:
+
 
 \begin{eqnarray*}
 \centerline{
-     \xymatrix@C=5cm@R=2cm{
-          \ensuremath{{\mathit C}^{*}}
-               \ar@/^1pc/[r]^-{\ensuremath{\Varid{outList}}}
-     &
-          \ensuremath{\mathrm{1}\mathbin{+}\mathit C\times{\mathit C}^{*}}
-               \ar@/^1pc/[l]^-{\ensuremath{\Varid{inList}}}
-     \\
-          \ensuremath{{\Conid{A}}^{*}\times{\mathit B}^{*}}
-               \ar[u]^-{\ensuremath{\anaList{\Varid{geneZW}}}}
-               \ar@/_1pc/[r]_-{\ensuremath{\Varid{geneZW}}}
-     &
-          \ensuremath{\mathrm{1}\mathbin{+}\mathit C\times({\Conid{A}}^{*}\times{\mathit B}^{*})}
-               \ar[u]_{\ensuremath{\Varid{id}\mathbin{+}\Varid{id}\times\anaList{\Varid{geneZW}}}}
-     }
+\xymatrix@R=1.5cm{
+   \ensuremath{{\Conid{A}}^{*}\times({({\Conid{A}}^{*})}^{*}\times{({\Conid{A}}^{*})}^{*})}
+      \ar[d]^-{\ensuremath{\Varid{singl}\times\Varid{juntaListas}}} 
+\\
+   \ensuremath{{\Conid{A}}^{*}\times{({\Conid{A}}^{*})}^{*}}
+      \ar[d]^-{\ensuremath{\Varid{cons}}}
+\\
+   \ensuremath{{({\Conid{A}}^{*})}^{*}}
+}
 }
 \end{eqnarray*}
 
+Logo a definição de \ensuremath{\Varid{glevels}} é a seguinte:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
-\column{6}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{zipWith'}\mathbin{::}(\Varid{a}\to \Varid{b}\to \Varid{c})\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to [\mskip1.5mu \Varid{b}\mskip1.5mu]\to [\mskip1.5mu \Varid{c}\mskip1.5mu]{}\<[E]%
-\\
-\>[B]{}\Varid{zipWith'}\;\Varid{f}\mathrel{=}\overline{\anaList{\Varid{geneZW}}}\;\mathbf{where}{}\<[E]%
-\\
-\>[B]{}\hsindent{6}{}\<[6]%
-\>[6]{}\Varid{geneZW}\;([\mskip1.5mu \mskip1.5mu],\anonymous )\mathrel{=}i_1\;(){}\<[E]%
-\\
-\>[B]{}\hsindent{6}{}\<[6]%
-\>[6]{}\Varid{geneZW}\;(\anonymous ,[\mskip1.5mu \mskip1.5mu])\mathrel{=}i_1\;(){}\<[E]%
-\\
-\>[B]{}\hsindent{6}{}\<[6]%
-\>[6]{}\Varid{geneZW}\;((\Varid{a}\mathbin{:}\Varid{as}),(\Varid{b}\mathbin{:}\Varid{bs}))\mathrel{=}i_2\;(\Varid{f}\;\Varid{a}\;\Varid{b},(\Varid{as},\Varid{bs})){}\<[E]%
+\>[B]{}\Varid{glevels'}\mathrel{=}\alt{\Varid{nil}}{\Varid{cons}\comp (\Varid{singl}\times\Varid{juntaListas})}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 

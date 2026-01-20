@@ -1458,10 +1458,7 @@ Overfull \hbox (20.0pt too wide) in alignment at lines 918--935
 
 \openout7 = `cp2526t.ptb'.
 
-<xymatrix 3x2 246>
-Overfull \hbox (20.0pt too wide) in alignment at lines 955--974
- [][][] []
- []
+\openout7 = `cp2526t.ptb'.
 
 
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
@@ -1471,25 +1468,34 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 [9]
 \openout7 = `cp2526t.ptb'.
 
- <xymatrix 2x2 256>
-Overfull \hbox (20.0pt too wide) in alignment at lines 996--1013
+\openout7 = `cp2526t.ptb'.
+
+ <xymatrix 3x2 246>
+Overfull \hbox (20.0pt too wide) in alignment at lines 983--1002
  [][][] []
  []
 
 \openout7 = `cp2526t.ptb'.
 
-<xymatrix 2x2 256>
-Overfull \hbox (20.0pt too wide) in alignment at lines 1048--1065
+<xymatrix 1x3 102>
+Overfull \hbox (20.0pt too wide) in alignment at lines 1027--1039
  [][][] []
  []
+
+\openout7 = `cp2526t.ptb'.
 
 
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[10] <xymatrix 2x1 54>
-Overfull \hbox (20.0pt too wide) in alignment at lines 1072--1081
+[10] <xymatrix 2x2 256>
+Overfull \hbox (20.0pt too wide) in alignment at lines 1063--1080
+ [][][] []
+ []
+
+<xymatrix 2x1 54>
+Overfull \hbox (20.0pt too wide) in alignment at lines 1087--1096
  [][][] []
  []
 
@@ -1515,14 +1521,37 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 [12]
 \openout7 = `cp2526t.ptb'.
 
+
+Overfull \hbox (128.0374pt too wide) has occurred while \output is active
+ [][]| 
+ []
+
+[11]
 \openout7 = `cp2526t.ptb'.
 
+
+Overfull \hbox (128.0374pt too wide) has occurred while \output is active
+ [][]| 
+ []
+
+[12]
+\openout7 = `cp2526t.ptb'.
+
+
+Overfull \hbox (128.0374pt too wide) has occurred while \output is active
+ [][]| 
+ []
+
+[11]
+\openout7 = `cp2526t.ptb'.
+
+ (./cp2526t.ind
  (./cp2526t.ind
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[13] [14
+[11] [12
 
 
 ]) (./cp2526t.bbl
