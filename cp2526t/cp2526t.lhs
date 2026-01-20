@@ -1295,10 +1295,46 @@ gene (Right (x, ys)) = D [(x:ys, 0.95), (ys, 0.05)]
 \end{code}
 \end{center}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\textbf{Cálculo das soluções}
 
+Tendo |gene| definido, basta correr no interpretador |transmitir ["Vamos","atacar","hoje"]| para calcular as probabilidades de todas as possíveis frases transmitidas. Fazendo isso, obtêve-se:
 
+\begin{center}
+\begin{tabular}{l r}
+Mensagem transmitida & Probabilidade \\ \hline
+\texttt{["Vamos","atacar","hoje","stop"]} & $77.2\%$ \\
+\texttt{["Vamos","atacar","hoje"]} & $8.6\%$ \\
+\texttt{["Vamos","atacar","stop"]} & $4.1\%$ \\
+\texttt{["Vamos","hoje","stop"]} & $4.1\%$ \\
+\texttt{["atacar","hoje","stop"]} & $4.1\%$ \\
+\texttt{["Vamos","atacar"]} & $0.5\%$ \\
+\texttt{["Vamos","hoje"]} & $0.5\%$ \\
+\texttt{["atacar","hoje"]} & $0.5\%$ \\
+\texttt{["Vamos","stop"]} & $0.2\%$ \\
+\texttt{["atacar","stop"]} & $0.2\%$ \\
+\texttt{["hoje","stop"]} & $0.2\%$ \\
+\texttt{["atacar"]} & $0.0\%$ \\
+\texttt{["hoje"]} & $0.0\%$ \\
+\texttt{["Vamos"]} & $0.0\%$ \\
+\texttt{["stop"]} & $0.0\%$ \\
+\texttt{[]} & $0.0\%$ \\
+\end{tabular}
+\end{center}
 
+Assim, observando os resultados obtidos, é possível responder às questões propostas:
 
+\begin{itemize}
+     \item Qual a probabilidade da palavra "atacar" da mensagem se perder? 
+     \textbf {É de 4.1\%.}
+     \item Qual a probabilidade de seguirem todas as palavras, mas faltar o "stop"?
+     \textbf {É de 8.6\%.}
+     \item Qual a probabilidade da transmissão ser perfeita?
+     \textbf {É de 77.2\%.}
+\end{itemize}
 
 
 
