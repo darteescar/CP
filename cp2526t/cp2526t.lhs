@@ -863,6 +863,65 @@ No \textbf{Problema 2},
 
 
 \subsection*{Problema 3}
+No \textbf{Problema 3}, pretende-se definir a função |fair_merge| como um anamorfismo de |Streams|.
+Esta estratégia de |merging| permite que os elementos das duas |Streams| sejam intercalados de forma justa,
+ou seja, cada elemento de uma |Stream| é seguido por um elemento da outra |Stream|.
+
+Tal como pedido no enunciado, vamos começar por derivar a lei dual da recursividade mútua.
+
+\begin{eqnarray*}
+\start
+|
+        either f g = anaStream (either h k)
+|
+\just\equiv{ Universal-ana }
+|
+     outStream . (either f g) = fF (either f g) . (either h k)
+|
+\just\equiv{ Fusão- + (2x)}
+|
+     either (outStream . f) (outStream . g) = either (fF (either f g) . h) (fF (either f g) . k)
+|
+\just\equiv{ Eq- + }
+|
+     lcbr(
+          outStream . f = fF (either f g) . h
+     )(
+          outStream . g = fF (either f g) . k
+     )
+|
+\qed
+\end{eqnarray*}
+
+Fica então demonstrada a lei dual da recursividade mútua.
+
+
+
+
+\begin{eqnarray*}
+\centerline{
+     \xymatrix@@C=2cm@@R=2cm{
+          |Stream A|
+               \ar[r]^-{|outBTree|}
+     &
+          |A >< Stream A|
+     \\
+          |Either (Stream A >< Stream A) (Stream A >< Stream A)|
+               \ar[u]^-{|anaStream geneFM|}
+               \ar@@/_1pc/[r]_-{|geneFM|}
+     &
+          |A >< (Either (Stream A >< Stream A) (Stream A >< Stream A))|
+               \ar[u]_{|fF (anaStream geneFM) = id >< anaStream geneFM|}
+     }
+}
+\end{eqnarray*} 
+
+
+
+
+
+
+
 
 
 \begin{code}

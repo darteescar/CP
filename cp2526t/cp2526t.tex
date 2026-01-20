@@ -1130,6 +1130,53 @@ No \textbf{Problema 2},
 
 
 \subsection*{Problema 3}
+No \textbf{Problema 3}, pretende-se definir a função \ensuremath{\Varid{fair\char95 merge}} como um anamorfismo de \ensuremath{\Conid{Streams}}.
+Esta estratégia de \ensuremath{\Varid{merging}} permite que os elementos das duas \ensuremath{\Conid{Streams}} sejam intercalados de forma justa,
+ou seja, cada elemento de uma \ensuremath{\Conid{Stream}} é seguido por um elemento da outra \ensuremath{\Conid{Stream}}.
+
+Tal como pedido no enunciado, vamos começar por derivar a lei dual da recursividade mútua.
+
+\begin{eqnarray*}
+\start
+\ensuremath{\alt{\Varid{f}}{\Varid{g}}\mathrel{=}\lanabracket\,\alt{\Varid{h}}{\Varid{k}}\,\ranabracket}
+\just\equiv{ Universal-ana }
+\ensuremath{\mathsf{out}\comp \alt{\Varid{f}}{\Varid{g}}\mathrel{=}\fun F \;\alt{\Varid{f}}{\Varid{g}}\comp \alt{\Varid{h}}{\Varid{k}}}
+\just\equiv{ Fusão- + (2x)}
+\ensuremath{\alt{\mathsf{out}\comp \Varid{f}}{\mathsf{out}\comp \Varid{g}}\mathrel{=}\alt{\fun F \;\alt{\Varid{f}}{\Varid{g}}\comp \Varid{h}}{\fun F \;\alt{\Varid{f}}{\Varid{g}}\comp \Varid{k}}}
+\just\equiv{ Eq- + }
+\ensuremath{\begin{lcbr}\mathsf{out}\comp \Varid{f}\mathrel{=}\fun F \;\alt{\Varid{f}}{\Varid{g}}\comp \Varid{h}\\\mathsf{out}\comp \Varid{g}\mathrel{=}\fun F \;\alt{\Varid{f}}{\Varid{g}}\comp \Varid{k}\end{lcbr}}
+\qed
+\end{eqnarray*}
+
+Fica então demonstrada a lei dual da recursividade mútua.
+
+
+
+
+\begin{eqnarray*}
+\centerline{
+     \xymatrix@C=2cm@R=2cm{
+          \ensuremath{\Conid{Stream}\;\Conid{A}}
+               \ar[r]^-{\ensuremath{\Varid{outBTree}}}
+     &
+          \ensuremath{\Conid{A}\times\Conid{Stream}\;\Conid{A}}
+     \\
+          \ensuremath{(\Conid{Stream}\;\Conid{A}\times\Conid{Stream}\;\Conid{A})+(\Conid{Stream}\;\Conid{A}\times\Conid{Stream}\;\Conid{A})}
+               \ar[u]^-{\ensuremath{\lanabracket\,\Varid{geneFM}\,\ranabracket}}
+               \ar@/_1pc/[r]_-{\ensuremath{\Varid{geneFM}}}
+     &
+          \ensuremath{\Conid{A}\times((\Conid{Stream}\;\Conid{A}\times\Conid{Stream}\;\Conid{A})+(\Conid{Stream}\;\Conid{A}\times\Conid{Stream}\;\Conid{A}))}
+               \ar[u]_{\ensuremath{\fun F \;\lanabracket\,\Varid{geneFM}\,\ranabracket\mathrel{=}\Varid{id}\times\lanabracket\,\Varid{geneFM}\,\ranabracket}}
+     }
+}
+\end{eqnarray*} 
+
+
+
+
+
+
+
 
 
 \begin{hscode}\SaveRestoreHook
