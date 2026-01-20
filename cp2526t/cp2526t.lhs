@@ -871,13 +871,11 @@ fair_merge' = anaStream undefined
 
 \subsection*{Problema 4}
 
-\subsection*{Problema 4}
-
 \textbf{Introdução}
 
 De uma forma simples, o objetivo deste problema é desenhar uma função |transmitir| que descreve o comportamento de um aparelho de telegrafia avariado. Esse aparelho tenta transmitir uma mensagem palavra a palavra, mas pode falhar de forma aleatória: cada palavra pode perder-se durante a transmissão e, no final da mensagem, o envio do código "stop" também pode falhar.
 
-Pretende-se que a função |transmitir| modele corretamente estas falhas, produzindo todas as mensagens possíveis, cada uma associada à respetiva probabilidade. Para tal, recorre-se a um catamorfismo probabilístico sobre listas, |pcataList|, cujo resultado é uma distribuição de probabilidades, representada pelo mónade |Dist|.
+Pretende-se que a função |transmitir| modele corretamente estas falhas, produzindo todas as mensagens possíveis, cada uma associada à respetiva probabilidade. Para tal, recorre-se a um catamorfismo probabilístico sobre listas, |pcataList|, cujo resultado é uma distribuição de probabilidades, representada pelo mónade Dist.
 
 O comportamento local do aparelho é descrito por um |gene|, que define as decisões probabilísticas a tomar em cada passo da transmissão. A função |transmitir = pcataList gene| separa assim o mecanismo genérico de percorrer a lista, do comportamento específico do aparelho.
 
@@ -887,7 +885,7 @@ Antes de apresentar a solução completa, é útil analisar cada componente que 
 
 No nosso projeto, é necessário modelar a transmissão de mensagens em que cada palavra pode falhar de forma aleatória. Para isso, precisamos de uma forma de representar todas as mensagens possíveis e associar a cada uma a sua probabilidade de ocorrência.
 
-O mónade |Dist| faz exatamente isso:
+O mónade Dist faz exatamente isso:
 
 \begin{center}
 \begin{code}
@@ -896,11 +894,11 @@ newtype Dist a = D { unD :: [(a, ProbRep)] }
 \end{center}
 
 \begin{itemize}
-     \item Cada a é um possível valor (no nosso caso, uma mensagem ou palavra transmitida).
-     \item Cada ProbRep é a probabilidade desse valor ocorrer (um número real entre 0 e 1, somando 1 no total).
+     \item Cada a é um possível valor (no caso, uma mensagem ou palavra transmitida).
+     \item Cada ProbRep é a probabilidade desse valor ocorrer (um número real entre 0 e 1, sendo a soma total das probabilidades 1).
 \end{itemize}
 
-|Dist| forma um mónade porque:
+Dist forma um mónade porque:
 
 \begin{center}
 \begin{itemize}
@@ -910,15 +908,13 @@ newtype Dist a = D { unD :: [(a, ProbRep)] }
 \end{itemize}
 \end{center}
 
-Esta definição permite combinar automaticamente as probabilidades de múltiplas etapas de cálculo. Por exemplo, ao percorrer uma lista de palavras, o mónade |Dist| calcula todas as combinações possíveis de palavras transmitidas e perdidas, multiplicando as probabilidades de cada passo sem necessidade de loops ou cálculos manuais. Assim, alterações no comportamento do |gene| propagam-se corretamente em toda a lista, sem haver necessidade de mudar nada mais do que as probabilidades definidas.
+Esta definição permite combinar automaticamente as probabilidades de múltiplas etapas de cálculo.
+Por exemplo, ao percorrer uma lista de palavras, o mónade Dist calcula todas as combinações
+possíveis de palavras transmitidas e perdidas, multiplicando as probabilidades associadas a cada passo,
+sem necessidade de ciclos explícitos ou cálculos manuais.
 
-No contexto do nosso problema, o mónade |Dist| é particularmente útil porque permite que a função |pcataList|:
-
-\begin{itemize}
-    \item percorra a lista de palavras,  
-    \item aplique probabilisticamente o |gene| a cada elemento, e  
-    \item combine corretamente todas as probabilidades resultantes, gerando a distribuição completa de mensagens possíveis.  
-\end{itemize}
+Desta forma, alterações no comportamento do |gene| propagam-se corretamente por toda a lista,
+sendo suficiente ajustar apenas as probabilidades associadas a cada decisão local.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -961,17 +957,63 @@ Nesta definição:
 
 Para ilustrar o seu funcionamento, considere a mensagem:
 \begin{center}
-["hi","bye"]
+["hi","hi again","bye"]
 \end{center}
 
+A aplicação de |pcataList gene| a esta lista é definida recursivamente, seguindo a estrutura do catamorfismo sobre listas. Os passos da execução, são:
 
-O |pcataList| processa a lista recursivamente da seguinte forma:
+\begin{itemize}
+    \item \textbf{Passo 1: lista completa ["hi","hi again","bye"]}  
+    \begin{center}
+    \begin{code}
+    pcataList gene ["hi","hi again","bye"] = do
+        y <- pcataList gene ["hi again","bye"];
+        gene (Right ("hi", y))
+    \end{code}
+    \end{center}
+    O valor $y$ representa uma distribuição de todos os resultados possíveis da cauda ["hi again","bye"].
 
-\begin{enumerate}
-    \item \textbf{Processa a cauda:} primeiro aplica-se |pcataList gene| à cauda da lista, neste caso ["bye"]. Isto produz uma distribuição de todas as possíveis mensagens resultantes da cauda, considerando as escolhas probabilísticas do \texttt{gene}. Chamemos esse resultado de $Y = pcataList~gene~["bye"]$.
-    
-    \item \textbf{Combina com a cabeça:} para cada possível resultado $y \in Y$, aplica-se |gene| à cabeça "hi" junto com $y$, ou seja, calcula-se \texttt{gene (Right ("hi", y))}. Este passo combina o efeito probabilístico da cabeça com todos os resultados possíveis da cauda.
-\end{enumerate}
+    \item \textbf{Passo 2: cauda ["hi again","bye"]}  
+    \begin{center}
+    \begin{code}
+    pcataList gene ["hi again","bye"] = do
+        y1 <- pcataList gene ["bye"];
+        gene (Right ("hi again", y1))
+    \end{code}
+    \end{center}
+    Cada resultado $y_1$ da chamada à cauda anterior é combinado com "hi again" através do |gene|, propagando todas as combinações possíveis com as probabilidades corretas.
+
+    \item \textbf{Passo 3: cauda ["bye"]}  
+    \begin{center}
+    \begin{code}
+    pcataList gene ["bye"] = do
+        y2 <- pcataList gene [];
+        gene (Right ("bye", y2))
+    \end{code}
+    \end{center}
+    Cada resultado $y_2$ do caso base é combinado com "bye" através do |gene|, multiplicando as probabilidades de cada etapa.
+
+    \item \textbf{Passo 4: caso base []}  
+    \begin{center}
+    \begin{code}
+    pcataList gene [] = gene (Left ())
+    \end{code}
+    \end{center}
+    Produz a distribuição inicial que representa as possíveis terminações da mensagem, de acordo com o comportamento probabilístico do |gene|.
+\end{itemize}
+
+A partir deste caso base, o catamorfismo combina sucessivamente cada palavra com todos os resultados possíveis da sua cauda, multiplicando as probabilidades locais. Deste modo, o valor
+
+\begin{center}
+\begin{code}
+pcataList gene ["hi","hi again","bye"]
+\end{code}
+\end{center}
+
+corresponde a uma única distribuição final que contém todas as mensagens possíveis resultantes da transmissão, já com as probabilidades corretamente combinadas.
+
+
+
 
 
 

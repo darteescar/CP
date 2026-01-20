@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.1.19)  19 JAN 2026 21:38
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex 2026.1.19)  20 JAN 2026 12:48
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1521,12 +1521,14 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
 [12]
 \openout7 = `cp2526t.ptb'.
 
+\openout7 = `cp2526t.ptb'.
 
-Overfull \hbox (128.0374pt too wide) has occurred while \output is active
- [][]| 
- []
+\openout7 = `cp2526t.ptb'.
 
-[11]
+\openout7 = `cp2526t.ptb'.
+
+\openout7 = `cp2526t.ptb'.
+
 \openout7 = `cp2526t.ptb'.
 
 
@@ -1534,24 +1536,15 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[12]
-\openout7 = `cp2526t.ptb'.
-
-
-Overfull \hbox (128.0374pt too wide) has occurred while \output is active
- [][]| 
- []
-
-[11]
+[13]
 \openout7 = `cp2526t.ptb'.
 
  (./cp2526t.ind
- (./cp2526t.ind
 Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[11] [12
+[14] [15
 
 
 ]) (./cp2526t.bbl
@@ -1564,7 +1557,7 @@ Overfull \hbox (128.0374pt too wide) has occurred while \output is active
  [][]| 
  []
 
-[15
+[16
 
 ] (./cp2526t.aux)
  ***********
@@ -1582,10 +1575,10 @@ Package rerunfilecheck Info: File `cp2526t.out' has not changed.
 (rerunfilecheck)             Checksum: 1D188B8CDF969C53DBC74774FEC30481;1480.
  ) 
 Here is how much of TeX's memory you used:
- 47854 strings out of 476106
- 1047299 string characters out of 5793933
- 1945975 words of memory out of 5000000
- 69140 multiletter control sequences out of 15000+600000
+ 47856 strings out of 476106
+ 1047313 string characters out of 5793933
+ 1941975 words of memory out of 5000000
+ 69143 multiletter control sequences out of 15000+600000
  815245 words of font info for 156 fonts, out of 8000000 for 9000
  59 hyphenation exceptions out of 8191
  99i,22n,101p,3281b,848s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1610,10 +1603,10 @@ ve/texmf-dist/fonts/type1/public/stmaryrd/stmary10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/stmaryrd/stmary9.pfb></usr/share/texlive/texmf-dist/f
 onts/type1/public/xypic/xyatip10.pfb></usr/share/texlive/texmf-dist/fonts/type1
 /public/xypic/xybtip10.pfb>
-Output written on cp2526t.pdf (16 pages, 1092273 bytes).
+Output written on cp2526t.pdf (17 pages, 1092438 bytes).
 PDF statistics:
- 367 PDF objects out of 1000 (max. 8388607)
- 292 compressed objects within 3 object streams
- 37 named destinations out of 1000 (max. 500000)
+ 366 PDF objects out of 1000 (max. 8388607)
+ 290 compressed objects within 3 object streams
+ 36 named destinations out of 1000 (max. 500000)
  102 words of extra memory for PDF output out of 10000 (max. 10000000)
 
