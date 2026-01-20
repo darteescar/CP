@@ -912,7 +912,7 @@ já que uma |Stream A| é decomposta num par com o primeiro elemento de um tipo 
 Tendo isto em conta, e sabendo que a função |fair_merge'| que queremos definir como um anamorfismo de |Streams| 
 é do tipo
 \begin{code} 
-fair_merge' :: Either (Stream A, Stream A) (Stream A, Stream A) -> Stream A 
+fair_merge' :: Either (Stream a, Stream a) (Stream a, Stream a) -> Stream a 
 \end{code}
 podemos representar o anamorfismo |fair_merge'| através do seguinte diagrama:
 
@@ -951,10 +951,47 @@ fair_merge' = anaStream geneFM
 onde o gene |geneFM| é definido como:
 
 \begin{code}
-geneFM :: Either (Stream a, Stream a) (Stream a, Stream a) -> a >< (Either (Stream a, Stream a) (Stream a, Stream a))
-geneFM i1(Cons(x,xs), y) = (x, i2(xs, y))
-geneFM i2(x, Cons(y,ys)) = (y, i1(x, ys))
+geneFM :: Either (Stream a, Stream a) (Stream a, Stream a) -> (a, Either (Stream a, Stream a) (Stream a, Stream a))
+geneFM (Left (Cons(x,xs), y)) = (x, Right (xs, y))
+geneFM (Right (x, Cons(y,ys))) = (y, Left (x, ys))
 \end{code}
+
+Para comprovar este resultado, podemos utilizar a lei dual da recursividade mútua que foi demonstrada anteriormente.
+Seja |fair_merge| dada por:
+\begin{spec}
+fair_merge = either h k
+\end{spec}
+
+E querendo demonstrar que |fair_merge = anaStream geneFM|, onde |geneFM| pode 
+ser decomposto em:
+\begin{spec}
+geneFM = either g1 g2 
+\end{spec}
+
+Tem-se:
+
+\begin{eqnarray*}
+\start
+|
+        either h k = anaStream geneFM
+|
+\just\equiv{ Lei dual da recursividade mútua }
+|
+     lcbr(
+          outStream . h = (id >< either h k) . g1
+     )(
+          outStream . k = (id >< either h k) . g2
+     )
+|
+\qed
+\end{eqnarray*}
+
+Para que estas equações sejam verdadeiras, é necessário encontrar |g1| e |g2|
+tais que as igualdades se verifiquem.
+
+
+
+
 
 
 
@@ -1070,7 +1107,6 @@ E que em listas os catamorfismos devem ter em conta os casos de lista vazia e n�
 
 \begin{center}
 \begin{code}
-pcataList :: (Either () (a, b) -> Dist b) -> [a] -> Dist b
 pcataList gene []     = gene (Left ())
 pcataList gene (x:xs) = do
     y <- pcataList gene xs

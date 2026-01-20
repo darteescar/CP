@@ -1173,7 +1173,7 @@ Tendo isto em conta, e sabendo que a função \ensuremath{\Varid{fair\char95 mer
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{fair\char95 merge'}\mathbin{::}(\Conid{Stream}\;\Conid{A},\Conid{Stream}\;\Conid{A})+(\Conid{Stream}\;\Conid{A},\Conid{Stream}\;\Conid{A})\to \Conid{Stream}\;\Conid{A}{}\<[E]%
+\>[B]{}\Varid{fair\char95 merge'}\mathbin{::}(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})+(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})\to \Conid{Stream}\;\Varid{a}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 podemos representar o anamorfismo \ensuremath{\Varid{fair\char95 merge'}} através do seguinte diagrama:
@@ -1227,13 +1227,43 @@ onde o gene \ensuremath{\Varid{geneFM}} é definido como:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{geneFM}\mathbin{::}(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})+(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})\to \Varid{a}\times((\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})+(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})){}\<[E]%
+\>[B]{}\Varid{geneFM}\mathbin{::}(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})+(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})\to (\Varid{a},(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})+(\Conid{Stream}\;\Varid{a},\Conid{Stream}\;\Varid{a})){}\<[E]%
 \\
-\>[B]{}\Varid{geneFM}\;i_1\;(\Conid{Cons}\;(\Varid{x},\Varid{xs}),\Varid{y})\mathrel{=}(\Varid{x},i_2\;(\Varid{xs},\Varid{y})){}\<[E]%
+\>[B]{}\Varid{geneFM}\;(i_1\;(\Conid{Cons}\;(\Varid{x},\Varid{xs}),\Varid{y}))\mathrel{=}(\Varid{x},i_2\;(\Varid{xs},\Varid{y})){}\<[E]%
 \\
-\>[B]{}\Varid{geneFM}\;i_2\;(\Varid{x},\Conid{Cons}\;(\Varid{y},\Varid{ys}))\mathrel{=}(\Varid{y},i_1\;(\Varid{x},\Varid{ys})){}\<[E]%
+\>[B]{}\Varid{geneFM}\;(i_2\;(\Varid{x},\Conid{Cons}\;(\Varid{y},\Varid{ys})))\mathrel{=}(\Varid{y},i_1\;(\Varid{x},\Varid{ys})){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
+
+Para comprovar este resultado, podemos utilizar a lei dual da recursividade mútua que foi demonstrada anteriormente.
+Seja \ensuremath{\Varid{fair\char95 merge}} dada por:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{fair\char95 merge}\mathrel{=}\alt{\Varid{h}}{\Varid{k}}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+E querendo demonstrar que \ensuremath{\Varid{fair\char95 merge}\mathrel{=}\lanabracket\,\Varid{geneFM}\,\ranabracket}, onde \ensuremath{\Varid{geneFM}} pode 
+ser decomposto em:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{geneFM}\mathrel{=}\alt{\Varid{g1}}{\Varid{g2}}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Tem-se:
+
+\begin{eqnarray*}
+\start
+\ensuremath{\alt{\Varid{h}}{\Varid{k}}\mathrel{=}\lanabracket\,\Varid{geneFM}\,\ranabracket}
+\just\equiv{ Lei dual da recursividade mútua }
+\ensuremath{\begin{lcbr}\mathsf{out}\comp \Varid{h}\mathrel{=}(\Varid{id}\times\alt{\Varid{h}}{\Varid{k}})\comp \Varid{g1}\\\mathsf{out}\comp \Varid{k}\mathrel{=}(\Varid{id}\times\alt{\Varid{h}}{\Varid{k}})\comp \Varid{g2}\end{lcbr}}
+\qed
+\end{eqnarray*}
+
+
 
 
 
@@ -1362,8 +1392,6 @@ E que em listas os catamorfismos devem ter em conta os casos de lista vazia e n�
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{23}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{pcataList}\mathbin{::}(()+(\Varid{a},\Varid{b})\to \fun{Dist}\;\Varid{b})\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \fun{Dist}\;\Varid{b}{}\<[E]%
-\\
 \>[B]{}\Varid{pcataList}\;\Varid{gene}\;[\mskip1.5mu \mskip1.5mu]{}\<[23]%
 \>[23]{}\mathrel{=}\Varid{gene}\;(i_1\;()){}\<[E]%
 \\
