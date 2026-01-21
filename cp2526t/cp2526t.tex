@@ -1189,7 +1189,7 @@ de forma a podermos aplicar a lei da recursividade mútua. Assim sendo, poderiam
 \ColumnHook
 \end{hscode}\resethooks
 
-onde \ensuremath{\Varid{num}\;\Varid{x}\;\Varid{n}} calcula o numerador \ensuremath{\Varid{x}\mathbin{\uparrow}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{1})} e \ensuremath{\Varid{den}\;\Varid{x}\;\Varid{n}} calcula o denominador \ensuremath{{(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{1})!}}.
+onde \ensuremath{\Varid{num}\;\Varid{x}\;\Varid{n}} calcula o numerador \ensuremath{\Varid{x}\mathbin{\uparrow}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{3})} e \ensuremath{\Varid{den}\;\Varid{x}\;\Varid{n}} calcula o denominador \ensuremath{{(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{3})!}}.
 
 Para o numerador, podemos descobrir qual é a diferença entre dois termos consecutivos
 fazendo a seguinte análise:
@@ -1418,11 +1418,11 @@ e \ensuremath{\Varid{loop}\;\Varid{x}} como:
 \ColumnHook
 \end{hscode}\resethooks
 
-Trocando o nome de algumas funções, temos o \ensuremath{\Varid{loop}} como:
+Trocando o nome de algumas variáveis, temos o \ensuremath{\Varid{loop}} como:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
-\>[B]{}\Varid{loop}\;\Varid{x}\;[\mskip1.5mu \Varid{s},\Varid{h},\Varid{k},\Varid{j'},\Varid{m}\mskip1.5mu]\mathrel{=}[\mskip1.5mu \Varid{s}\mathbin{+}\Varid{h}\mathbin{/}\Varid{k},\Varid{x}\mathbin{\uparrow}\mathrm{2}\mathbin{*}\Varid{h},\Varid{k}\mathbin{*}\Varid{j},\Varid{j}\mathbin{+}\Varid{m},\Varid{m}\mathbin{+}\mathrm{8}\mskip1.5mu]{}\<[E]%
+\>[B]{}\Varid{loop}\;\Varid{x}\;[\mskip1.5mu \Varid{s},\Varid{h},\Varid{k},\Varid{j},\Varid{m}\mskip1.5mu]\mathrel{=}[\mskip1.5mu \Varid{s}\mathbin{+}\Varid{h}\mathbin{/}\Varid{k},\Varid{x}\mathbin{\uparrow}\mathrm{2}\mathbin{*}\Varid{h},\Varid{k}\mathbin{*}\Varid{j},\Varid{j}\mathbin{+}\Varid{m},\Varid{m}\mathbin{+}\mathrm{8}\mskip1.5mu]{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 
