@@ -863,8 +863,211 @@ geneBF (Node (a,(l,r)):t) = i2 (a, t ++ [l,r])
 \end{code}
 
 \subsection*{Problema 2}
-No \textbf{Problema 2}, 
+No \textbf{Problema 2}, o objetivo é derivarmos a função |f|, que calcula o seno hiperbólico
+de |x|, |sinh x|, para |n| aproximações da sua série de Taylor, a partir da série de Taylor de |sinh x|
+que é dada por:
 
+\begin{center}
+$sinh \ x = \sum_{n=0}^{\infty} \frac{x^{2n+1}}{(2n+1)!} = x + \frac{x^3}{3!} + \frac{x^5}{5!} + ...$
+\end{center}
+
+No nosso caso, iremos utilizar uma aproximação com |n| termos da série de Taylor, ou seja:
+
+\begin{center}
+$sinh \ x \ n = \sum_{i=0}^{n-1} \frac{x^{2i+1}}{(2i+1)!}$
+\end{center}
+
+A derivação para a função |f| é necessária pois no caso de definirmos |sinh x n| 
+diretamente de forma recursiva
+
+\begin{spec}
+sinh x 0 = x 
+sinh x (n+1) = (x^(2*(n+1)+1)) / fac((2*(n+1)+1)) + sinh x n 
+\end{spec}
+
+e fazendo os cálculos temos 
+
+\begin{spec}
+sinh x 0 = x 
+sinh x (n+1) = (x^(2*n+3)) / fac((2*n+3)) + sinh x n 
+\end{spec}
+
+verificamos que esta definição não é eficiente, já que em cada passo recursivo
+é necessário calcular |x^(2*n+3)| e |fac((2*n+3))|, o que não se verifica em 
+|f|, pois com o |loop|, os valores do vetor inicial |start x = [x,x^3,6,20,22]|
+são atualizados em cada iteração de forma linear, evitando cálculos desnecessários.
+
+Com o estudo da secção da Lei da Recursividade Mútua no livro do professor J.N.Oliveira
+\cite{Ol98-24}, entendemos que devíamos partir o problema em duas funções recursivas,
+uma referente ao numerador da fração de |sinh x n| e outra referente ao denominador,
+de forma a podermos aplicar a lei da recursividade mútua. Assim sendo, poderiamos definir 
+|sinh x n| como uma soma da seguinte forma:
+
+\begin{spec}
+soma x 0 = x
+soma x (n+1) = num x (n+1) / den x (n+1)  + soma x n 
+\end{spec}
+
+onde |num x n| calcula o numerador |x^(2*n+1)| e |den x n| calcula o denominador |fac((2*n+1))|.
+
+Para o numerador, podemos descobrir qual é a diferença entre dois termos consecutivos
+fazendo a seguinte análise:
+
+\begin{center}
+$\frac {num_{n+1}}{num_n} = \frac{x^{2(n+1)+3}}{x^{2n+3}} = \frac{x^{2n+5}}{x^{2n+3}} = x^2$
+\end{center}
+
+ou seja, o próximo termo do numerador é obtido multiplicando o termo atual por $x^2$.
+Podemos concluir que o numerador pode ser definido recursivamente da seguinte forma:
+
+\begin{spec}
+num x 1 = x^3
+num x (n+1) = x^2 * num x n
+\end{spec}
+
+Para o denominador, podemos descobrir qual é a diferença entre dois termos consecutivos
+fazendo a seguinte análise:
+
+\begin{center}
+$\frac {den_{n+1}}{den_n} = \frac{(2(n+1)+3)!}{(2n+3)!} = \frac{(2n+5)!}{(2n+3)!} = (2n+5)(2n+4)$
+\end{center} 
+
+ou seja, o próximo termo do denominador é obtido multiplicando o termo atual por $(2n+5)(2n+4)$.
+Podemos concluir que o denominador pode ser definido recursivamente da seguinte forma:
+
+\begin{spec}
+den x 1 = fac 3 = 6
+den x (n+1) = (2n+5)(2n+4) * den x n
+\end{spec}
+
+Contudo, esta definição recursiva do denominador ainda depende de |n|, o que não é desejável,
+por isso, é necessário a simplificar, até não dependa de |n|. Para isso, faça-se
+
+\begin{spec}
+j x n = (2n+5)*(2n+4)
+\end{spec}
+
+tal como é feito no livro do professor.
+
+Para descobrirmos a diferença entre dois termos consecutivos, fazemos a seguinte análise:
+
+\begin{center}
+$j_{n+1} - j_n = (2(n+1)+5)(2(n+1)+4) - (2n+5)(2n+4) = 8n +22$
+\end{center}
+
+ou seja, o próximo termo de |j| é obtido somando ao termo atual $8n + 22$.
+Podemos concluir que |j| pode ser definida recursivamente da seguinte forma:
+
+\begin{spec}
+j x 0 = 20
+j x (n+1) = (8*n + 22) + j x n
+\end{spec}
+
+Mais uma vez, esta definição recursiva de |j| ainda depende de |n|, o que não é desejável,
+por isso, voltamos a repetir o processo até não depender de |n|. Para isso, faça-se
+
+\begin{spec}
+m x n = 8*n + 22
+\end{spec}
+
+Para descobrirmos a diferença entre dois termos consecutivos, fazemos a seguinte análise:
+
+\begin{center}
+$m_{n+1} - m_n = 8(n+1) + 22 - (8n + 22) = 8$
+\end{center}
+
+ou seja, o próximo termo de |m| é obtido somando ao termo atual $8$.
+Podemos concluir que |m| pode ser definida recursivamente da seguinte forma:
+
+\begin{spec}
+m x 0 = 22
+m x (n+1) = 8 + m x n
+\end{spec}
+
+Agora que |m| tem uma definição recursiva que não depende de |n|, 
+podemos aplicar a lei da recursividade mútua, de forma a obter a
+definição de |f|.
+
+Recapitulando todas as funções que foram definidas nesta derivação temos:
+\begin{spec}
+soma x 0 = x
+soma x (n+1) = num x (n+1) / den x (n+1)  + soma x n 
+\end{spec}
+
+\begin{spec}
+num x 1 = x^3
+num x (n+1) = x^2 * num x n
+\end{spec}
+
+\begin{spec}
+den x 1 = fac 3 = 6
+den x (n+1) = (2n+5)(2n+4) * den x n
+\end{spec}
+
+\begin{spec}
+j x 0 = 20
+j x (n+1) = (8*n + 22) + j x n
+\end{spec}
+
+\begin{spec}
+m x 0 = 22
+m x (n+1) = 8 + m x n
+\end{spec}
+
+E com estas funções, podemos reconstruir |soma| da seguinte forma:
+
+\begin{spec}
+m x 0 = 22
+m x (n+1) = 8 + m x n
+\end{spec}
+
+\begin{spec}
+j' x 0 = 20
+j' x (n+1) = m x n + j' x n
+\end{spec}
+
+\begin{spec}
+den' x 1 = fac 3 = 6
+den' x (n+1) = j' x n * den' x n
+\end{spec}
+
+\begin{spec}
+soma' x 0 = x
+soma' x (n+1) = num x (n+1) / den' x (n+1)  + soma' x n 
+\end{spec}
+
+E pela lei da recursividade mútua, podemos escrever |soma| como:
+
+\begin{spec}
+soma'' x n = s where
+     (s,_,_,_,_) = aux x 0
+     aux x 0 = (x, x^3, 6, 20, 22)
+     aux x (n+1) = let (s,num,den,j',m) = aux x n in (s + num / den, x^2 * num, den * j', j' + m, m + 8)
+\end{spec}
+
+Tal como é dito no livro, |aux| é um |loop|, onde |aux 0| corresponde ao valor inicial
+e |aux (n+1)| corresponde à atualização dos valores em cada iteração do |loop|.
+
+Desta forma, adaptando a notação usada no livro do professor, conseguimos definir |start x|
+e |loop x| como:
+
+\begin{spec}
+start x = [x, x^3, 6, 20, 22]
+\end{spec}
+
+\begin{spec}
+loop x [s, num, den, j', m] = [s + num / den, x^2 * num, den * j', j' + m, m + 8]
+\end{spec}
+
+Trocando o nome de algumas funções, temos o |loop| como:
+\begin{spec}
+loop x [s, h, k, j', m] = [s + h / k, x^2 * h, k * j, j + m, m + 8]
+\end{spec}
+
+Na variável |s| está o valor acumulado da soma, ou seja, o cálculo de |sinh x n|,
+pelo que basta fazer |head| do resultado do |loop| após |n| iterações, para obter o valor final de |sinh x n|.
+
+Fica assim derivada a função |f| como pedido no enunciado.
 
 \subsection*{Problema 3}
 No \textbf{Problema 3}, pretende-se definir a função |fair_merge| como um anamorfismo de |Streams|.

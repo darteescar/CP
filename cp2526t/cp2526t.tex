@@ -1130,8 +1130,306 @@ O anamorfismo repete este processo até que a floresta esteja vazia.
 \end{hscode}\resethooks
 
 \subsection*{Problema 2}
-No \textbf{Problema 2}, 
+No \textbf{Problema 2}, o objetivo é derivarmos a função \ensuremath{\Varid{f}}, que calcula o seno hiperbólico
+de \ensuremath{\Varid{x}}, \ensuremath{\Varid{sinh}\;\Varid{x}}, para \ensuremath{\Varid{n}} aproximações da sua série de Taylor, a partir da série de Taylor de \ensuremath{\Varid{sinh}\;\Varid{x}}
+que é dada por:
 
+\begin{center}
+$sinh \ x = \sum_{n=0}^{\infty} \frac{x^{2n+1}}{(2n+1)!} = x + \frac{x^3}{3!} + \frac{x^5}{5!} + ...$
+\end{center}
+
+No nosso caso, iremos utilizar uma aproximação com \ensuremath{\Varid{n}} termos da série de Taylor, ou seja:
+
+\begin{center}
+$sinh \ x \ n = \sum_{i=0}^{n-1} \frac{x^{2i+1}}{(2i+1)!}$
+\end{center}
+
+A derivação para a função \ensuremath{\Varid{f}} é necessária pois no caso de definirmos \ensuremath{\Varid{sinh}\;\Varid{x}\;\Varid{n}} 
+diretamente de forma recursiva
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{sinh}\;\Varid{x}\;\mathrm{0}\mathrel{=}\Varid{x}{}\<[E]%
+\\
+\>[B]{}\Varid{sinh}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}(\Varid{x}\mathbin{\uparrow}(\mathrm{2}\mathbin{*}(\Varid{n}\mathbin{+}\mathrm{1})\mathbin{+}\mathrm{1}))\mathbin{/}{(\mathrm{2}\mathbin{*}(\Varid{n}\mathbin{+}\mathrm{1})\mathbin{+}\mathrm{1})!}\mathbin{+}\Varid{sinh}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+e fazendo os cálculos temos 
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{sinh}\;\Varid{x}\;\mathrm{0}\mathrel{=}\Varid{x}{}\<[E]%
+\\
+\>[B]{}\Varid{sinh}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}(\Varid{x}\mathbin{\uparrow}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{3}))\mathbin{/}{(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{3})!}\mathbin{+}\Varid{sinh}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+verificamos que esta definição não é eficiente, já que em cada passo recursivo
+é necessário calcular \ensuremath{\Varid{x}\mathbin{\uparrow}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{3})} e \ensuremath{{(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{3})!}}, o que não se verifica em 
+\ensuremath{\Varid{f}}, pois com o \ensuremath{\Varid{loop}}, os valores do vetor inicial \ensuremath{\Varid{start}\;\Varid{x}\mathrel{=}[\mskip1.5mu \Varid{x},\Varid{x}\mathbin{\uparrow}\mathrm{3},\mathrm{6},\mathrm{20},\mathrm{22}\mskip1.5mu]}
+são atualizados em cada iteração de forma linear, evitando cálculos desnecessários.
+
+Com o estudo da secção da Lei da Recursividade Mútua no livro do professor J.N.Oliveira
+\cite{Ol98-24}, entendemos que devíamos partir o problema em duas funções recursivas,
+uma referente ao numerador da fração de \ensuremath{\Varid{sinh}\;\Varid{x}\;\Varid{n}} e outra referente ao denominador,
+de forma a podermos aplicar a lei da recursividade mútua. Assim sendo, poderiamos definir 
+\ensuremath{\Varid{sinh}\;\Varid{x}\;\Varid{n}} como uma soma da seguinte forma:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{43}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{soma}\;\Varid{x}\;\mathrm{0}\mathrel{=}\Varid{x}{}\<[E]%
+\\
+\>[B]{}\Varid{soma}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}\Varid{num}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathbin{/}\Varid{den}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1}){}\<[43]%
+\>[43]{}\mathbin{+}\Varid{soma}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+onde \ensuremath{\Varid{num}\;\Varid{x}\;\Varid{n}} calcula o numerador \ensuremath{\Varid{x}\mathbin{\uparrow}(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{1})} e \ensuremath{\Varid{den}\;\Varid{x}\;\Varid{n}} calcula o denominador \ensuremath{{(\mathrm{2}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{1})!}}.
+
+Para o numerador, podemos descobrir qual é a diferença entre dois termos consecutivos
+fazendo a seguinte análise:
+
+\begin{center}
+$\frac {num_{n+1}}{num_n} = \frac{x^{2(n+1)+3}}{x^{2n+3}} = \frac{x^{2n+5}}{x^{2n+3}} = x^2$
+\end{center}
+
+ou seja, o próximo termo do numerador é obtido multiplicando o termo atual por $x^2$.
+Podemos concluir que o numerador pode ser definido recursivamente da seguinte forma:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{num}\;\Varid{x}\;\mathrm{1}\mathrel{=}\Varid{x}\mathbin{\uparrow}\mathrm{3}{}\<[E]%
+\\
+\>[B]{}\Varid{num}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}\Varid{x}\mathbin{\uparrow}\mathrm{2}\mathbin{*}\Varid{num}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Para o denominador, podemos descobrir qual é a diferença entre dois termos consecutivos
+fazendo a seguinte análise:
+
+\begin{center}
+$\frac {den_{n+1}}{den_n} = \frac{(2(n+1)+3)!}{(2n+3)!} = \frac{(2n+5)!}{(2n+3)!} = (2n+5)(2n+4)$
+\end{center} 
+
+ou seja, o próximo termo do denominador é obtido multiplicando o termo atual por $(2n+5)(2n+4)$.
+Podemos concluir que o denominador pode ser definido recursivamente da seguinte forma:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{den}\;\Varid{x}\;\mathrm{1}\mathrel{=}{\mathrm{3}!}\mathrel{=}\mathrm{6}{}\<[E]%
+\\
+\>[B]{}\Varid{den}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}(\mathrm{2}\;\Varid{n}\mathbin{+}\mathrm{5})\;(\mathrm{2}\;\Varid{n}\mathbin{+}\mathrm{4})\mathbin{*}\Varid{den}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Contudo, esta definição recursiva do denominador ainda depende de \ensuremath{\Varid{n}}, o que não é desejável,
+por isso, é necessário a simplificar, até não dependa de \ensuremath{\Varid{n}}. Para isso, faça-se
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{j}\;\Varid{x}\;\Varid{n}\mathrel{=}(\mathrm{2}\;\Varid{n}\mathbin{+}\mathrm{5})\mathbin{*}(\mathrm{2}\;\Varid{n}\mathbin{+}\mathrm{4}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+tal como é feito no livro do professor.
+
+Para descobrirmos a diferença entre dois termos consecutivos, fazemos a seguinte análise:
+
+\begin{center}
+$j_{n+1} - j_n = (2(n+1)+5)(2(n+1)+4) - (2n+5)(2n+4) = 8n +22$
+\end{center}
+
+ou seja, o próximo termo de \ensuremath{\Varid{j}} é obtido somando ao termo atual $8n + 22$.
+Podemos concluir que \ensuremath{\Varid{j}} pode ser definida recursivamente da seguinte forma:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{j}\;\Varid{x}\;\mathrm{0}\mathrel{=}\mathrm{20}{}\<[E]%
+\\
+\>[B]{}\Varid{j}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}(\mathrm{8}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{22})\mathbin{+}\Varid{j}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Mais uma vez, esta definição recursiva de \ensuremath{\Varid{j}} ainda depende de \ensuremath{\Varid{n}}, o que não é desejável,
+por isso, voltamos a repetir o processo até não depender de \ensuremath{\Varid{n}}. Para isso, faça-se
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{m}\;\Varid{x}\;\Varid{n}\mathrel{=}\mathrm{8}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{22}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Para descobrirmos a diferença entre dois termos consecutivos, fazemos a seguinte análise:
+
+\begin{center}
+$m_{n+1} - m_n = 8(n+1) + 22 - (8n + 22) = 8$
+\end{center}
+
+ou seja, o próximo termo de \ensuremath{\Varid{m}} é obtido somando ao termo atual $8$.
+Podemos concluir que \ensuremath{\Varid{m}} pode ser definida recursivamente da seguinte forma:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{m}\;\Varid{x}\;\mathrm{0}\mathrel{=}\mathrm{22}{}\<[E]%
+\\
+\>[B]{}\Varid{m}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}\mathrm{8}\mathbin{+}\Varid{m}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Agora que \ensuremath{\Varid{m}} tem uma definição recursiva que não depende de \ensuremath{\Varid{n}}, 
+podemos aplicar a lei da recursividade mútua, de forma a obter a
+definição de \ensuremath{\Varid{f}}.
+
+Recapitulando todas as funções que foram definidas nesta derivação temos:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{43}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{soma}\;\Varid{x}\;\mathrm{0}\mathrel{=}\Varid{x}{}\<[E]%
+\\
+\>[B]{}\Varid{soma}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}\Varid{num}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathbin{/}\Varid{den}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1}){}\<[43]%
+\>[43]{}\mathbin{+}\Varid{soma}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{num}\;\Varid{x}\;\mathrm{1}\mathrel{=}\Varid{x}\mathbin{\uparrow}\mathrm{3}{}\<[E]%
+\\
+\>[B]{}\Varid{num}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}\Varid{x}\mathbin{\uparrow}\mathrm{2}\mathbin{*}\Varid{num}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{den}\;\Varid{x}\;\mathrm{1}\mathrel{=}{\mathrm{3}!}\mathrel{=}\mathrm{6}{}\<[E]%
+\\
+\>[B]{}\Varid{den}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}(\mathrm{2}\;\Varid{n}\mathbin{+}\mathrm{5})\;(\mathrm{2}\;\Varid{n}\mathbin{+}\mathrm{4})\mathbin{*}\Varid{den}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{j}\;\Varid{x}\;\mathrm{0}\mathrel{=}\mathrm{20}{}\<[E]%
+\\
+\>[B]{}\Varid{j}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}(\mathrm{8}\mathbin{*}\Varid{n}\mathbin{+}\mathrm{22})\mathbin{+}\Varid{j}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{m}\;\Varid{x}\;\mathrm{0}\mathrel{=}\mathrm{22}{}\<[E]%
+\\
+\>[B]{}\Varid{m}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}\mathrm{8}\mathbin{+}\Varid{m}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+E com estas funções, podemos reconstruir \ensuremath{\Varid{soma}} da seguinte forma:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{m}\;\Varid{x}\;\mathrm{0}\mathrel{=}\mathrm{22}{}\<[E]%
+\\
+\>[B]{}\Varid{m}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}\mathrm{8}\mathbin{+}\Varid{m}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{j'}\;\Varid{x}\;\mathrm{0}\mathrel{=}\mathrm{20}{}\<[E]%
+\\
+\>[B]{}\Varid{j'}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}\Varid{m}\;\Varid{x}\;\Varid{n}\mathbin{+}\Varid{j'}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{den'}\;\Varid{x}\;\mathrm{1}\mathrel{=}{\mathrm{3}!}\mathrel{=}\mathrm{6}{}\<[E]%
+\\
+\>[B]{}\Varid{den'}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}\Varid{j'}\;\Varid{x}\;\Varid{n}\mathbin{*}\Varid{den'}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{45}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{soma'}\;\Varid{x}\;\mathrm{0}\mathrel{=}\Varid{x}{}\<[E]%
+\\
+\>[B]{}\Varid{soma'}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}\Varid{num}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathbin{/}\Varid{den'}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1}){}\<[45]%
+\>[45]{}\mathbin{+}\Varid{soma'}\;\Varid{x}\;\Varid{n}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+E pela lei da recursividade mútua, podemos escrever \ensuremath{\Varid{soma}} como:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{6}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{soma''}\;\Varid{x}\;\Varid{n}\mathrel{=}\Varid{s}\;\mathbf{where}{}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}(\Varid{s},\anonymous ,\anonymous ,\anonymous ,\anonymous )\mathrel{=}\Varid{aux}\;\Varid{x}\;\mathrm{0}{}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\Varid{aux}\;\Varid{x}\;\mathrm{0}\mathrel{=}(\Varid{x},\Varid{x}\mathbin{\uparrow}\mathrm{3},\mathrm{6},\mathrm{20},\mathrm{22}){}\<[E]%
+\\
+\>[B]{}\hsindent{6}{}\<[6]%
+\>[6]{}\Varid{aux}\;\Varid{x}\;(\Varid{n}\mathbin{+}\mathrm{1})\mathrel{=}\mathbf{let}\;(\Varid{s},\Varid{num},\Varid{den},\Varid{j'},\Varid{m})\mathrel{=}\Varid{aux}\;\Varid{x}\;\Varid{n}\;\mathbf{in}\;(\Varid{s}\mathbin{+}\Varid{num}\mathbin{/}\Varid{den},\Varid{x}\mathbin{\uparrow}\mathrm{2}\mathbin{*}\Varid{num},\Varid{den}\mathbin{*}\Varid{j'},\Varid{j'}\mathbin{+}\Varid{m},\Varid{m}\mathbin{+}\mathrm{8}){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Tal como é dito no livro, \ensuremath{\Varid{aux}} é um \ensuremath{\Varid{loop}}, onde \ensuremath{\Varid{aux}\;\mathrm{0}} corresponde ao valor inicial
+e \ensuremath{\Varid{aux}\;(\Varid{n}\mathbin{+}\mathrm{1})} corresponde à atualização dos valores em cada iteração do \ensuremath{\Varid{loop}}.
+
+Desta forma, adaptando a notação usada no livro do professor, conseguimos definir \ensuremath{\Varid{start}\;\Varid{x}}
+e \ensuremath{\Varid{loop}\;\Varid{x}} como:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{start}\;\Varid{x}\mathrel{=}[\mskip1.5mu \Varid{x},\Varid{x}\mathbin{\uparrow}\mathrm{3},\mathrm{6},\mathrm{20},\mathrm{22}\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{loop}\;\Varid{x}\;[\mskip1.5mu \Varid{s},\Varid{num},\Varid{den},\Varid{j'},\Varid{m}\mskip1.5mu]\mathrel{=}[\mskip1.5mu \Varid{s}\mathbin{+}\Varid{num}\mathbin{/}\Varid{den},\Varid{x}\mathbin{\uparrow}\mathrm{2}\mathbin{*}\Varid{num},\Varid{den}\mathbin{*}\Varid{j'},\Varid{j'}\mathbin{+}\Varid{m},\Varid{m}\mathbin{+}\mathrm{8}\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Trocando o nome de algumas funções, temos o \ensuremath{\Varid{loop}} como:
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\Varid{loop}\;\Varid{x}\;[\mskip1.5mu \Varid{s},\Varid{h},\Varid{k},\Varid{j'},\Varid{m}\mskip1.5mu]\mathrel{=}[\mskip1.5mu \Varid{s}\mathbin{+}\Varid{h}\mathbin{/}\Varid{k},\Varid{x}\mathbin{\uparrow}\mathrm{2}\mathbin{*}\Varid{h},\Varid{k}\mathbin{*}\Varid{j},\Varid{j}\mathbin{+}\Varid{m},\Varid{m}\mathbin{+}\mathrm{8}\mskip1.5mu]{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Na variável \ensuremath{\Varid{s}} está o valor acumulado da soma, ou seja, o cálculo de \ensuremath{\Varid{sinh}\;\Varid{x}\;\Varid{n}},
+pelo que basta fazer \ensuremath{\Varid{head}} do resultado do \ensuremath{\Varid{loop}} após \ensuremath{\Varid{n}} iterações, para obter o valor final de \ensuremath{\Varid{sinh}\;\Varid{x}\;\Varid{n}}.
+
+Fica assim derivada a função \ensuremath{\Varid{f}} como pedido no enunciado.
 
 \subsection*{Problema 3}
 No \textbf{Problema 3}, pretende-se definir a função \ensuremath{\Varid{fair\char95 merge}} como um anamorfismo de \ensuremath{\Conid{Streams}}.
