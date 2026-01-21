@@ -1638,9 +1638,68 @@ Assim, observando os resultados obtidos, é possível responder às questões pr
      \textbf {É de 77.2\%.}
 \end{itemize}
 
+\textbf{Verificação das soluções}
+
+Tal como feito em alguns dos problemas anteriores, decidimos que seria interessante testar os resultados a que chegamos neste problema também. Para isto, aplicando conhecimento de Elementos de Probabilidades adquiridos ao longo do curso, fizemos:
+
+Tendo em conta as probabilidades dadas no enunciado do problema:
+\begin{itemize}
+     \item Seja $P(w)$ a probabilidade da palavra $w$ ser transmitida, com $P(w)=0.95$. 
+     \item Seja P(não transmitir "stop") a probabilidade de não transmitir "stop" no fim da mensagem, com P(não transmitir "stop") = $0.1$
+
+     E sabendo que:
+     \item A probabilidade $P(m)$ é a probabilidade da mensagem transmitida ser $m$.
+\end{itemize}
+
+Pode-se calcular as probabilidades dos casos pedidos:
+
+\begin{itemize}
+     \item \textbf{1-} Qual a probabilidade da palavra "atacar" da mensagem se perder? 
+
+     Sabendo que a mensagem transmitida neste caso seria:
+
+     m1 = ["Vamos","hoje","stop"]
+     \begin{align*}
+     P(m1) &= P(\text{``Vamos''}) 
+          \times (1 - P(\text{``atacar''})) 
+          \times P(\text{``hoje''}) 
+          \times (1 - P(\text{não transmitir ``stop''})) \\
+          &= 0.95 \times 0.05 \times 0.95 \times 0.9 \\
+          &= 0.0406125 \approx 0.041 = 4.1\%
+     \end{align*}
 
 
+     \item \textbf{2-} Qual a probabilidade de seguirem todas as palavras, mas faltar o "stop"?
 
+     Sendo a mensagem transmitida: 
+
+     m2 = ["Vamos","atacar","hoje"]
+     \begin{align*}
+     P(m2) &= P(\text{``Vamos''}) 
+          \times P(\text{``atacar''}) 
+          \times P(\text{``hoje''}) 
+          \times P(\text{não transmitir ``stop''}) \\
+          &= 0.95 \times 0.95 \times 0.95 \times 0.1 \\
+          &= 0.0857375 \approx 0.086 = 8.6\%
+     \end{align*}
+
+
+     \item \textbf{3-} Qual a probabilidade da transmissão ser perfeita?
+
+     Neste caso, a mensagem transmitida seria:
+
+     m3 = ["Vamos","atacar","hoje","stop"]
+     \begin{align*}
+     P(m3) &= P(\text{``Vamos''}) 
+          \times P(\text{``atacar''}) 
+          \times P(\text{``hoje''}) 
+          \times (1 - P(\text{não transmitir ``stop''})) \\
+          &= 0.95 \times 0.95 \times 0.95 \times 0.9 \\
+          &= 0.7716375 \approx 0.772 = 77.2\%
+     \end{align*}
+\end{itemize}
+
+Logo, por comparação dos resultados obtidos a partir do interpretador e das soluções calculadas, pode-se concluir que as funções usadas funcionam de acordo com o desejado.
 
 
 
