@@ -908,7 +908,7 @@ soma x 0 = x
 soma x (n+1) = num x (n+1) / den x (n+1)  + soma x n 
 \end{spec}
 
-onde |num x n| calcula o numerador |x^(2*n+1)| e |den x n| calcula o denominador |fac((2*n+1))|.
+onde |num x n| calcula o numerador |x^(2*n+3)| e |den x n| calcula o denominador |fac((2*n+3))|.
 
 Para o numerador, podemos descobrir qual é a diferença entre dois termos consecutivos
 fazendo a seguinte análise:
@@ -1059,9 +1059,9 @@ start x = [x, x^3, 6, 20, 22]
 loop x [s, num, den, j', m] = [s + num / den, x^2 * num, den * j', j' + m, m + 8]
 \end{spec}
 
-Trocando o nome de algumas funções, temos o |loop| como:
+Trocando o nome de algumas variáveis, temos o |loop| como:
 \begin{spec}
-loop x [s, h, k, j', m] = [s + h / k, x^2 * h, k * j, j + m, m + 8]
+loop x [s, h, k, j, m] = [s + h / k, x^2 * h, k * j, j + m, m + 8]
 \end{spec}
 
 Na variável |s| está o valor acumulado da soma, ou seja, o cálculo de |sinh x n|,
