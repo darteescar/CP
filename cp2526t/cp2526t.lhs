@@ -1040,7 +1040,7 @@ E pela lei da recursividade mútua, podemos escrever |soma| como:
 
 \begin{spec}
 soma'' x n = s where
-     (s,_,_,_,_) = aux x 0
+     (s,_,_,_,_) = aux x n
      aux x 0 = (x, x^3, 6, 20, 22)
      aux x (n+1) = let (s,num,den,j',m) = aux x n in (s + num / den, x^2 * num, den * j', j' + m, m + 8)
 \end{spec}
