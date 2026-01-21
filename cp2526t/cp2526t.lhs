@@ -774,7 +774,7 @@ podemos esquematizar o lado direito da solução desta forma:
 \begin{eqnarray*}
 \centerline{
 \xymatrix@@R=1cm{
-   |Seq A >< (Seq((Seq A)) >< Seq((Seq A)))|
+   |A >< (Seq((Seq A)) >< Seq((Seq A)))|
       \ar[d]^-{|singl >< juntaListas|} 
 \\
    |Seq A >< Seq((Seq A))|
@@ -785,7 +785,7 @@ podemos esquematizar o lado direito da solução desta forma:
 }
 \end{eqnarray*}
 
-Logo a definição de |glevels| é a seguinte:
+Logo a definição |pointfree| de |glevels| é a seguinte:
 \begin{code}
 glevels' = either nil (cons . (singl >< juntaListas))
 \end{code}
@@ -810,10 +810,10 @@ Para representar este algoritmo como um anamorfismo, começamos por desenhar o s
 \centerline{
      \xymatrix@@C=5cm@@R=2cm{
           |Seq A|
-               \ar@@/^1pc/[r]^-{|outBTree|}
+               \ar@@/^1pc/[r]^-{|outList|}
      &
           |1 + A >< Seq A|
-               \ar@@/^1pc/[l]^-{|inBTree|}
+               \ar@@/^1pc/[l]^-{|inList|}
      \\
           |Seq ((BTree A))|
                \ar[u]^-{|anaList geneBF|}
@@ -1084,14 +1084,14 @@ A aplicação de |takeStream 10 (fair_merge' (Left (s1,s2)))| resulta na lista:
 \begin{spec}
 [1,2,3,4,5,6,7,8,9,10]
 \end{spec}
-refletindo a intercalção justa dos elementos das duas |Streams|, 
+refletindo a intercalação justa dos elementos das duas |Streams|, 
 começando pela primeira.
 
 A aplicação de |takeStream 10 (fair_merge' (Right (s1,s2)))| resulta na lista:
 \begin{spec}
 [2,1,4,3,6,5,8,7,10,9]
 \end{spec}
-refletindo a intercalção justa dos elementos das duas |Streams|, 
+refletindo a intercalação justa dos elementos das duas |Streams|, 
 começando pela segunda.
 \subsection*{Problema 4}
 
@@ -1107,7 +1107,7 @@ Antes de apresentar a solução completa, achamos útil analisar cada componente
 
 \textbf{Uso de Dist}
 
-No nosso projeto, é necessário modelar a transmissão de mensagens, em que cada palavra pode falhar de forma aleatória. Para isso, precisamos de uma forma de representar todas as mensagens possíveis e associar a cada uma a sua probabilidade de ocorrência.
+Para este problema, é necessário modelar a transmissão de mensagens, em que cada palavra pode falhar de forma aleatória. Para isso, precisamos de uma forma de representar todas as mensagens possíveis e associar a cada uma a sua probabilidade de ocorrência.
 
 O mónade Dist faz exatamente isso:
 
@@ -1118,8 +1118,8 @@ newtype Dist a = D { unD :: [(a, ProbRep)] }
 \end{center}
 
 \begin{itemize}
-     \item Cada a é um possível valor (no caso, uma mensagem ou palavra transmitida).
-     \item Cada ProbRep é a probabilidade desse valor ocorrer (um número real entre 0 e 1, sendo a soma total das probabilidades 1).
+     \item Cada |a| é um possível valor (no caso, uma mensagem ou palavra transmitida).
+     \item Cada |ProbRep| é a probabilidade desse valor ocorrer (um número real entre 0 e 1, sendo a soma total das probabilidades 1).
 \end{itemize}
 
 Dist forma um mónade porque:

@@ -1029,7 +1029,7 @@ podemos esquematizar o lado direito da solução desta forma:
 \begin{eqnarray*}
 \centerline{
 \xymatrix@R=1cm{
-   \ensuremath{{\Conid{A}}^{*}\times({({\Conid{A}}^{*})}^{*}\times{({\Conid{A}}^{*})}^{*})}
+   \ensuremath{\Conid{A}\times({({\Conid{A}}^{*})}^{*}\times{({\Conid{A}}^{*})}^{*})}
       \ar[d]^-{\ensuremath{\Varid{singl}\times\Varid{juntaListas}}} 
 \\
    \ensuremath{{\Conid{A}}^{*}\times{({\Conid{A}}^{*})}^{*}}
@@ -1040,7 +1040,7 @@ podemos esquematizar o lado direito da solução desta forma:
 }
 \end{eqnarray*}
 
-Logo a definição de \ensuremath{\Varid{glevels}} é a seguinte:
+Logo a definição \ensuremath{\Varid{pointfree}} de \ensuremath{\Varid{glevels}} é a seguinte:
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1068,10 +1068,10 @@ Para representar este algoritmo como um anamorfismo, começamos por desenhar o s
 \centerline{
      \xymatrix@C=5cm@R=2cm{
           \ensuremath{{\Conid{A}}^{*}}
-               \ar@/^1pc/[r]^-{\ensuremath{\Varid{outBTree}}}
+               \ar@/^1pc/[r]^-{\ensuremath{\Varid{outList}}}
      &
           \ensuremath{\mathrm{1}\mathbin{+}\Conid{A}\times{\Conid{A}}^{*}}
-               \ar@/^1pc/[l]^-{\ensuremath{\Varid{inBTree}}}
+               \ar@/^1pc/[l]^-{\ensuremath{\Varid{inList}}}
      \\
           \ensuremath{{(\Conid{BTree}\;\Conid{A})}^{*}}
                \ar[u]^-{\ensuremath{\anaList{\Varid{geneBF}}}}
@@ -1354,7 +1354,7 @@ A aplicação de \ensuremath{\Varid{takeStream}\;\mathrm{10}\;(\Varid{fair\char9
 \>[B]{}[\mskip1.5mu \mathrm{1},\mathrm{2},\mathrm{3},\mathrm{4},\mathrm{5},\mathrm{6},\mathrm{7},\mathrm{8},\mathrm{9},\mathrm{10}\mskip1.5mu]{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-refletindo a intercalção justa dos elementos das duas \ensuremath{\Conid{Streams}}, 
+refletindo a intercalação justa dos elementos das duas \ensuremath{\Conid{Streams}}, 
 começando pela primeira.
 
 A aplicação de \ensuremath{\Varid{takeStream}\;\mathrm{10}\;(\Varid{fair\char95 merge'}\;(i_2\;(\Varid{s1},\Varid{s2})))} resulta na lista:
@@ -1364,7 +1364,7 @@ A aplicação de \ensuremath{\Varid{takeStream}\;\mathrm{10}\;(\Varid{fair\char9
 \>[B]{}[\mskip1.5mu \mathrm{2},\mathrm{1},\mathrm{4},\mathrm{3},\mathrm{6},\mathrm{5},\mathrm{8},\mathrm{7},\mathrm{10},\mathrm{9}\mskip1.5mu]{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-refletindo a intercalção justa dos elementos das duas \ensuremath{\Conid{Streams}}, 
+refletindo a intercalação justa dos elementos das duas \ensuremath{\Conid{Streams}}, 
 começando pela segunda.
 \subsection*{Problema 4}
 
@@ -1380,7 +1380,7 @@ Antes de apresentar a solução completa, achamos útil analisar cada componente
 
 \textbf{Uso de Dist}
 
-No nosso projeto, é necessário modelar a transmissão de mensagens, em que cada palavra pode falhar de forma aleatória. Para isso, precisamos de uma forma de representar todas as mensagens possíveis e associar a cada uma a sua probabilidade de ocorrência.
+Para este problema, é necessário modelar a transmissão de mensagens, em que cada palavra pode falhar de forma aleatória. Para isso, precisamos de uma forma de representar todas as mensagens possíveis e associar a cada uma a sua probabilidade de ocorrência.
 
 O mónade Dist faz exatamente isso:
 
@@ -1394,8 +1394,8 @@ O mónade Dist faz exatamente isso:
 \end{center}
 
 \begin{itemize}
-     \item Cada a é um possível valor (no caso, uma mensagem ou palavra transmitida).
-     \item Cada ProbRep é a probabilidade desse valor ocorrer (um número real entre 0 e 1, sendo a soma total das probabilidades 1).
+     \item Cada \ensuremath{\Varid{a}} é um possível valor (no caso, uma mensagem ou palavra transmitida).
+     \item Cada \ensuremath{\Conid{ProbRep}} é a probabilidade desse valor ocorrer (um número real entre 0 e 1, sendo a soma total das probabilidades 1).
 \end{itemize}
 
 Dist forma um mónade porque:
