@@ -1776,8 +1776,8 @@ Como:
 No caso probabilístico, \ensuremath{\Varid{pcataList}} funciona de forma análoga, mas cada chamada recursiva produz uma distribuição de resultados, em vez de um único valor. Assim:
 
 \begin{itemize}
-     \item Caso base: a lista é vazia, não há valores intermédios a combinar, e o resultado é obtido aplicando diretamente o \ensuremath{\Varid{gene}} a \texttt{Left ()}.
-     \item Caso recursivo: a chamada \ensuremath{\Varid{pcataList}\;\Varid{gene}\;\Varid{xs}} devolve uma distribuição de resultados da cauda. Cada valor desta distribuição deve ser processado pelo \ensuremath{\Varid{gene}} novamente, combinando as probabilidades corretamente.
+     \item \textbf{Caso base:} a lista é vazia, não há valores intermédios a combinar, e o resultado é obtido aplicando diretamente o \ensuremath{\Varid{gene}} a \texttt{Left ()}.
+     \item \textbf{Caso recursivo:} a chamada \ensuremath{\Varid{pcataList}\;\Varid{gene}\;\Varid{xs}} devolve uma distribuição de resultados da cauda. Cada valor desta distribuição deve ser processado pelo \ensuremath{\Varid{gene}} novamente, combinando as probabilidades corretamente.
 \end{itemize}
 
 Esta combinação de resultados intermédios segue exatamente o padrão de composição monádica, pelo que é necessário usar a operação \ensuremath{\bind } do mónade \ensuremath{\fun{Dist}}. O \ensuremath{\Varid{bind}} permite propagar automaticamente as probabilidades de cada passo, replicando o comportamento de \ensuremath{\llparenthesis\, \cdot \,\rrparenthesis} num contexto probabilístico. Aplicando este raciocínio ao caso base e ao caso recursivo, obtemos a definição de \ensuremath{\Varid{pcataList}}:
