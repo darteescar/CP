@@ -1230,7 +1230,7 @@ Podemos concluir que o denominador pode ser definido recursivamente da seguinte 
 \end{hscode}\resethooks
 
 Contudo, esta definição recursiva do denominador ainda depende de \ensuremath{\Varid{n}}, o que não é desejável,
-por isso, é necessário a simplificar, até não dependa de \ensuremath{\Varid{n}}. Para isso, faça-se
+por isso, é necessário simplificá-la até não dependa de \ensuremath{\Varid{n}}. Para isso, faça-se
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1760,7 +1760,7 @@ O catamorfismo \ensuremath{\Varid{pcataList}} percorre a lista de palavras de fo
 \ColumnHook
 \end{hscode}\resethooks
 
-E embora a sua definição de não seja dada explicitamente, o seu comportamento pode ser compreendido observando a analogia direta com o catamorfismo determinístico \ensuremath{\llparenthesis\, \cdot \,\rrparenthesis}.
+E embora a sua definição não seja dada explicitamente, o seu comportamento pode ser compreendido observando a analogia direta com o catamorfismo determinístico \ensuremath{\llparenthesis\, \cdot \,\rrparenthesis}.
 
 Como: 
 
@@ -1805,14 +1805,17 @@ Que pode ser expandida removendo a notação 'do' e usando o operador \ensuremat
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{6}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{11}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[6]{}\Varid{pcataList}\;\Varid{gene}\;[\mskip1.5mu \mskip1.5mu]\mathrel{=}\Varid{gene}\;(i_1\;()){}\<[E]%
 \\
 \>[6]{}\Varid{pcataList}\;\Varid{gene}\;(\Varid{x}\mathbin{:}\Varid{xs})\mathrel{=}{}\<[E]%
 \\
-\>[6]{}\Varid{pcataList}\;\Varid{gene}\;\Varid{xs}\bind \lambda \Varid{y}\to {}\<[E]%
+\>[6]{}\hsindent{5}{}\<[11]%
+\>[11]{}\Varid{pcataList}\;\Varid{gene}\;\Varid{xs}\bind \lambda \Varid{y}\to {}\<[E]%
 \\
-\>[6]{}\Varid{gene}\;(i_2\;(\Varid{x},\Varid{y})){}\<[E]%
+\>[6]{}\hsindent{5}{}\<[11]%
+\>[11]{}\Varid{gene}\;(i_2\;(\Varid{x},\Varid{y})){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
 

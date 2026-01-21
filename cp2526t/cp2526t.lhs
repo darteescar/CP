@@ -941,7 +941,7 @@ den x (n+1) = (2n+5)(2n+4) * den x n
 \end{spec}
 
 Contudo, esta definição recursiva do denominador ainda depende de |n|, o que não é desejável,
-por isso, é necessário a simplificar, até não dependa de |n|. Para isso, faça-se
+por isso, é necessário simplificá-la até não dependa de |n|. Para isso, faça-se
 
 \begin{spec}
 j x n = (2n+5)*(2n+4)
@@ -1383,7 +1383,7 @@ O catamorfismo |pcataList| percorre a lista de palavras de forma recursiva, apli
 pcataList :: (Either () (a, b) -> Dist b) -> [a] -> Dist b
 \end{spec}
 
-E embora a sua definição de não seja dada explicitamente, o seu comportamento pode ser compreendido observando a analogia direta com o catamorfismo determinístico |cataList|.
+E embora a sua definição não seja dada explicitamente, o seu comportamento pode ser compreendido observando a analogia direta com o catamorfismo determinístico |cataList|.
 
 Como: 
 
@@ -1414,8 +1414,8 @@ Que pode ser expandida removendo a notação 'do' e usando o operador |bind| dir
 \begin{spec}
      pcataList gene [] = gene (Left ())
      pcataList gene (x:xs) =
-     pcataList gene xs >>= \y ->
-     gene (Right (x, y))
+          pcataList gene xs >>= \y ->
+          gene (Right (x, y))
 \end{spec}
 
 Em ambas as definições:
