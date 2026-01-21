@@ -1103,7 +1103,7 @@ Pretende-se que a função |transmitir| modele corretamente estas falhas, produz
 
 O comportamento local do aparelho é descrito por um |gene|, que define as decisões probabilísticas a tomar em cada passo da transmissão. A função |transmitir = pcataList gene| separa, assim, o mecanismo genérico de percorrer a lista, do comportamento específico do aparelho.
 
-Antes de apresentar a solução completa, achamos útil analisar cada componente que será usado para que, de seguida, a definição do gene seja mais intuitiva de deduzir e possa ser aplicada para verificar a solução para o problema proposto.
+Antes de apresentar a solução completa, achamos útil analisar cada componente que será usado para que, de seguida, a solução para o problema proposto seja mais fácil de perceber.
 
 \textbf{Uso de Dist}
 
@@ -1159,7 +1159,7 @@ Pode-se afirmar que o tipo do |gene| é:
 gene :: Either () (String, [String]) -> Dist [String]
 \end{spec}
 
-Já que o uso do |Either| permite separar de forma natural os dois casos distintos que surgem ao percorrer uma lista:
+já que o uso do |Either| permite separar de forma natural os dois casos distintos que surgem ao percorrer uma lista:
 
 \begin{itemize}
     \item \textbf{Lista vazia:} representada por |Left ()|. Este caso corresponde ao fim da lista, permitindo decidir probabilisticamente se a transmissão termina corretamente ou se ocorre a falha de envio de "stop". 
@@ -1180,7 +1180,24 @@ O catamorfismo |pcataList| percorre a lista de palavras de forma recursiva, apli
 pcataList :: (Either () (a, b) -> Dist b) -> [a] -> Dist b
 \end{spec}
 
-E que em listas, os catamorfismos devem ter em conta os casos de lista vazia e não vazia, é possível deduzir a definição de |pcataList| como sendo:
+E embora a sua definição de não seja dada explicitamente, o seu comportamento pode ser compreendido observando a analogia direta com o catamorfismo determinístico |cataList|.
+
+Como: 
+
+\begin{spec}
+cataList g = g . recList (cataList g) . outList
+\end{spec}
+
+|outList| desconstrói a lista (vazia ou cabeça+cauda) e |recList| aplica recursivamente o catamorfismo à cauda. No caso determinístico, cada passo devolve apenas um valor, que é então combinado por |g|.
+
+No caso probabilístico, |pcataList| funciona de forma análoga, mas cada chamada recursiva produz uma distribuição de resultados, em vez de um único valor. Assim:
+
+\begin{itemize}
+     \item \textbf{Caso base:} a lista é vazia, não há valores intermédios a combinar, e o resultado é obtido aplicando diretamente o |gene| a \texttt{Left ()}.
+     \item \textbf{Caso recursivo:} a chamada |pcataList gene xs| devolve uma distribuição de resultados da cauda. Cada valor desta distribuição deve ser processado pelo |gene| novamente, combinando as probabilidades corretamente.
+\end{itemize}
+
+Esta combinação de resultados intermédios segue exatamente o padrão de composição monádica, pelo que é necessário usar a operação |>>=| do mónade |Dist|. O |bind| permite propagar automaticamente as probabilidades de cada passo, replicando o comportamento de |cataList| num contexto probabilístico. Aplicando este raciocínio ao caso base e ao caso recursivo, obtemos a definição de |pcataList|:
 
 \begin{code}
 pcataList gene []     = gene (Left ())
@@ -1189,11 +1206,20 @@ pcataList gene (x:xs) = do
     gene (Right (x, y))
 \end{code}
 
-Nesta definição:
+Que pode ser expandida removendo a notação 'do' e usando o operador |bind| diretamente:
+
+\begin{spec}
+     pcataList gene [] = gene (Left ())
+     pcataList gene (x:xs) =
+     pcataList gene xs >>= \y ->
+     gene (Right (x, y))
+\end{spec}
+
+Em ambas as definições:
 
 \begin{itemize}
     \item No caso da lista ser vazia, |gene| recebe |Left ()|, permitindo decidir probabilisticamente se o processo termina.
-    \item No caso da lista não ser vazia, a cauda da lista é processada primeiro recursivamente, produzindo $y$, que é então combinado com a cabeça $x$ através de |gene (Right (x, y))|.
+    \item No caso da lista não ser vazia, a cauda da lista é processada primeiro de forma recursiva, produzindo $y$, que representa todas as distribuições intermédias da cauda. Cada um desses resultados é então combinado com a cabeça $x$ através de |gene (Right (x, y))|, propagando corretamente as probabilidades de cada passo.
 \end{itemize}
 
 Para ilustrar o seu funcionamento, considere a mensagem:

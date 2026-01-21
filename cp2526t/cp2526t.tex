@@ -1376,7 +1376,7 @@ Pretende-se que a função \ensuremath{\Varid{transmitir}} modele corretamente e
 
 O comportamento local do aparelho é descrito por um \ensuremath{\Varid{gene}}, que define as decisões probabilísticas a tomar em cada passo da transmissão. A função \ensuremath{\Varid{transmitir}\mathrel{=}\Varid{pcataList}\;\Varid{gene}} separa, assim, o mecanismo genérico de percorrer a lista, do comportamento específico do aparelho.
 
-Antes de apresentar a solução completa, achamos útil analisar cada componente que será usado para que, de seguida, a definição do gene seja mais intuitiva de deduzir e possa ser aplicada para verificar a solução para o problema proposto.
+Antes de apresentar a solução completa, achamos útil analisar cada componente que será usado para que, de seguida, a solução para o problema proposto seja mais fácil de perceber.
 
 \textbf{Uso de Dist}
 
@@ -1438,7 +1438,7 @@ Pode-se afirmar que o tipo do \ensuremath{\Varid{gene}} é:
 \ColumnHook
 \end{hscode}\resethooks
 
-Já que o uso do \ensuremath{\cdot +\cdot } permite separar de forma natural os dois casos distintos que surgem ao percorrer uma lista:
+já que o uso do \ensuremath{\cdot +\cdot } permite separar de forma natural os dois casos distintos que surgem ao percorrer uma lista:
 
 \begin{itemize}
     \item \textbf{Lista vazia:} representada por \ensuremath{i_1\;()}. Este caso corresponde ao fim da lista, permitindo decidir probabilisticamente se a transmissão termina corretamente ou se ocorre a falha de envio de "stop". 
@@ -1462,7 +1462,27 @@ O catamorfismo \ensuremath{\Varid{pcataList}} percorre a lista de palavras de fo
 \ColumnHook
 \end{hscode}\resethooks
 
-E que em listas, os catamorfismos devem ter em conta os casos de lista vazia e não vazia, é possível deduzir a definição de \ensuremath{\Varid{pcataList}} como sendo:
+E embora a sua definição de não seja dada explicitamente, o seu comportamento pode ser compreendido observando a analogia direta com o catamorfismo determinístico \ensuremath{\llparenthesis\, \cdot \,\rrparenthesis}.
+
+Como: 
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\llparenthesis\, \Varid{g}\,\rrparenthesis\mathrel{=}\Varid{g}\comp \Varid{recList}\;\llparenthesis\, \Varid{g}\,\rrparenthesis\comp \Varid{outList}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\ensuremath{\Varid{outList}} desconstrói a lista (vazia ou cabeça+cauda) e \ensuremath{\Varid{recList}} aplica recursivamente o catamorfismo à cauda. No caso determinístico, cada passo devolve apenas um valor, que é então combinado por \ensuremath{\Varid{g}}.
+
+No caso probabilístico, \ensuremath{\Varid{pcataList}} funciona de forma análoga, mas cada chamada recursiva produz uma distribuição de resultados, em vez de um único valor. Assim:
+
+\begin{itemize}
+     \item Caso base: a lista é vazia, não há valores intermédios a combinar, e o resultado é obtido aplicando diretamente o \ensuremath{\Varid{gene}} a \texttt{Left ()}.
+     \item Caso recursivo: a chamada \ensuremath{\Varid{pcataList}\;\Varid{gene}\;\Varid{xs}} devolve uma distribuição de resultados da cauda. Cada valor desta distribuição deve ser processado pelo \ensuremath{\Varid{gene}} novamente, combinando as probabilidades corretamente.
+\end{itemize}
+
+Esta combinação de resultados intermédios segue exatamente o padrão de composição monádica, pelo que é necessário usar a operação \ensuremath{\bind } do mónade \ensuremath{\fun{Dist}}. O \ensuremath{\Varid{bind}} permite propagar automaticamente as probabilidades de cada passo, replicando o comportamento de \ensuremath{\llparenthesis\, \cdot \,\rrparenthesis} num contexto probabilístico. Aplicando este raciocínio ao caso base e ao caso recursivo, obtemos a definição de \ensuremath{\Varid{pcataList}}:
 
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1482,11 +1502,27 @@ E que em listas, os catamorfismos devem ter em conta os casos de lista vazia e n
 \ColumnHook
 \end{hscode}\resethooks
 
-Nesta definição:
+Que pode ser expandida removendo a notação 'do' e usando o operador \ensuremath{\Varid{bind}} diretamente:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{6}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[6]{}\Varid{pcataList}\;\Varid{gene}\;[\mskip1.5mu \mskip1.5mu]\mathrel{=}\Varid{gene}\;(i_1\;()){}\<[E]%
+\\
+\>[6]{}\Varid{pcataList}\;\Varid{gene}\;(\Varid{x}\mathbin{:}\Varid{xs})\mathrel{=}{}\<[E]%
+\\
+\>[6]{}\Varid{pcataList}\;\Varid{gene}\;\Varid{xs}\bind \lambda \Varid{y}\to {}\<[E]%
+\\
+\>[6]{}\Varid{gene}\;(i_2\;(\Varid{x},\Varid{y})){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Em ambas as definições:
 
 \begin{itemize}
     \item No caso da lista ser vazia, \ensuremath{\Varid{gene}} recebe \ensuremath{i_1\;()}, permitindo decidir probabilisticamente se o processo termina.
-    \item No caso da lista não ser vazia, a cauda da lista é processada primeiro recursivamente, produzindo $y$, que é então combinado com a cabeça $x$ através de \ensuremath{\Varid{gene}\;(i_2\;(\Varid{x},\Varid{y}))}.
+    \item No caso da lista não ser vazia, a cauda da lista é processada primeiro de forma recursiva, produzindo $y$, que representa todas as distribuições intermédias da cauda. Cada um desses resultados é então combinado com a cabeça $x$ através de \ensuremath{\Varid{gene}\;(i_2\;(\Varid{x},\Varid{y}))}, propagando corretamente as probabilidades de cada passo.
 \end{itemize}
 
 Para ilustrar o seu funcionamento, considere a mensagem:
