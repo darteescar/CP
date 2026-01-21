@@ -1306,7 +1306,7 @@ Pretende-se que a função |transmitir| modele corretamente estas falhas, produz
 
 O comportamento local do aparelho é descrito por um |gene|, que define as decisões probabilísticas a tomar em cada passo da transmissão. A função |transmitir = pcataList gene| separa, assim, o mecanismo genérico de percorrer a lista, do comportamento específico do aparelho.
 
-Antes de apresentar a solução completa, achamos útil analisar cada componente que será usado para que, de seguida, a definição do gene seja mais intuitiva de deduzir e possa ser aplicada para verificar a solução para o problema proposto.
+Antes de apresentar a solução completa, achamos útil analisar cada componente que será usado para que, de seguida, a solução para o problema proposto seja mais fácil de perceber.
 
 \textbf{Uso de Dist}
 
@@ -1314,11 +1314,9 @@ Para este problema, é necessário modelar a transmissão de mensagens, em que c
 
 O mónade Dist faz exatamente isso:
 
-\begin{center}
 \begin{spec}
 newtype Dist a = D { unD :: [(a, ProbRep)] }
 \end{spec}
-\end{center}
 
 \begin{itemize}
      \item Cada |a| é um possível valor (no caso, uma mensagem ou palavra transmitida).
@@ -1327,28 +1325,20 @@ newtype Dist a = D { unD :: [(a, ProbRep)] }
 
 Dist forma um mónade porque:
 
-\begin{center}
 \begin{itemize}
      \item Tem uma operação return: |return a = D [(a,1)]|, que gera uma distribuição determinística com probabilidade 1.  
      \item Tem uma composição de Kleisli (bind >>=): 
-     \begin{center}
      $(f \bullet g)~a = [(y,q*p) \mid (x,p) \leftarrow g~a, (y,q) \leftarrow f~x]$,  
-     \end{center}
      onde 
      
-     \begin{center}
      $g :: A \to \texttt{Dist B}$ 
-     \end{center}
 
      e 
 
-     \begin{center}
      $f :: B \to \texttt{Dist C}$ 
-     \end{center}
     
      são funções que representam computações probabilísticas.  
 \end{itemize}
-\end{center}
 
 Esta definição permite combinar automaticamente as probabilidades de múltiplas etapas de cálculo.
 Por exemplo, ao percorrer uma lista de palavras, o mónade Dist calcula todas as combinações
@@ -1368,13 +1358,11 @@ O |gene| deverá descrever o comportamento local do aparelho de telegrafia. Para
 
 Pode-se afirmar que o tipo do |gene| é:
 
-\begin{center}
 \begin{spec}
 gene :: Either () (String, [String]) -> Dist [String]
 \end{spec}
-\end{center}
 
-Já que o uso do |Either| permite separar de forma natural os dois casos distintos que surgem ao percorrer uma lista:
+já que o uso do |Either| permite separar de forma natural os dois casos distintos que surgem ao percorrer uma lista:
 
 \begin{itemize}
     \item \textbf{Lista vazia:} representada por |Left ()|. Este caso corresponde ao fim da lista, permitindo decidir probabilisticamente se a transmissão termina corretamente ou se ocorre a falha de envio de "stop". 
@@ -1391,84 +1379,95 @@ Desta forma, o |gene| consegue tratar de forma modular e uniforme tanto o caso b
 
 O catamorfismo |pcataList| percorre a lista de palavras de forma recursiva, aplicando a função |gene| a cada passo. Esta abordagem permite separar a lógica de percorrer a lista, da lógica de transmissão probabilística, tornando o comportamento do aparelho mais fácil de modelar. Sabendo a declaração de |pcataList| (dada no enunciado):
 
-\begin{center}
 \begin{spec}
 pcataList :: (Either () (a, b) -> Dist b) -> [a] -> Dist b
 \end{spec}
-\end{center}
 
-E que em listas, os catamorfismos devem ter em conta os casos de lista vazia e não vazia, é possível deduzir a definição de |pcataList| como sendo:
+E embora a sua definição de não seja dada explicitamente, o seu comportamento pode ser compreendido observando a analogia direta com o catamorfismo determinístico |cataList|.
 
-\begin{center}
+Como: 
+
+\begin{spec}
+cataList g = g . recList (cataList g) . outList
+\end{spec}
+
+|outList| desconstrói a lista (vazia ou cabeça+cauda) e |recList| aplica recursivamente o catamorfismo à cauda. No caso determinístico, cada passo devolve apenas um valor, que é então combinado por |g|.
+
+No caso probabilístico, |pcataList| funciona de forma análoga, mas cada chamada recursiva produz uma distribuição de resultados, em vez de um único valor. Assim:
+
+\begin{itemize}
+     \item \textbf{Caso base:} a lista é vazia, não há valores intermédios a combinar, e o resultado é obtido aplicando diretamente o |gene| a \texttt{Left ()}.
+     \item \textbf{Caso recursivo:} a chamada |pcataList gene xs| devolve uma distribuição de resultados da cauda. Cada valor desta distribuição deve ser processado pelo |gene| novamente, combinando as probabilidades corretamente.
+\end{itemize}
+
+Esta combinação de resultados intermédios segue exatamente o padrão de composição monádica, pelo que é necessário usar a operação |>>=| do mónade |Dist|. O |bind| permite propagar automaticamente as probabilidades de cada passo, replicando o comportamento de |cataList| num contexto probabilístico. Aplicando este raciocínio ao caso base e ao caso recursivo, obtemos a definição de |pcataList|:
+
 \begin{code}
 pcataList gene []     = gene (Left ())
 pcataList gene (x:xs) = do
     y <- pcataList gene xs
     gene (Right (x, y))
 \end{code}
-\end{center}
 
-Nesta definição:
+Que pode ser expandida removendo a notação 'do' e usando o operador |bind| diretamente:
+
+\begin{spec}
+     pcataList gene [] = gene (Left ())
+     pcataList gene (x:xs) =
+     pcataList gene xs >>= \y ->
+     gene (Right (x, y))
+\end{spec}
+
+Em ambas as definições:
 
 \begin{itemize}
     \item No caso da lista ser vazia, |gene| recebe |Left ()|, permitindo decidir probabilisticamente se o processo termina.
-    \item No caso da lista não ser vazia, a cauda da lista é processada primeiro recursivamente, produzindo $y$, que é então combinado com a cabeça $x$ através de |gene (Right (x, y))|.
+    \item No caso da lista não ser vazia, a cauda da lista é processada primeiro de forma recursiva, produzindo $y$, que representa todas as distribuições intermédias da cauda. Cada um desses resultados é então combinado com a cabeça $x$ através de |gene (Right (x, y))|, propagando corretamente as probabilidades de cada passo.
 \end{itemize}
 
 Para ilustrar o seu funcionamento, considere a mensagem:
-\begin{center}
+
 ["hi","hi again","bye"]
-\end{center}
 
 A aplicação de |pcataList gene| a esta lista é definida recursivamente, seguindo a estrutura do catamorfismo sobre listas. Os passos da execução, são:
 
 \begin{itemize}
      \item \textbf{Passo 1: lista completa ["hi","hi again","bye"]}  
-     \begin{center}
      \begin{spec}
      pcataList gene ["hi","hi again","bye"] = do 
         y <- pcataList gene ["hi again","bye"];
         gene (Right ("hi", y))
      \end{spec}
-     \end{center}
     O valor $y$ representa uma distribuição de todos os resultados possíveis da cauda ["hi again","bye"].
 
      \item \textbf{Passo 2: cauda ["hi again","bye"]}  
-     \begin{center}
      \begin{spec}
      pcataList gene ["hi again","bye"] = do
         y1 <- pcataList gene ["bye"];
         gene (Right ("hi again", y1))
      \end{spec}
-     \end{center}
     Cada resultado $y_1$ da chamada à cauda anterior é combinado com "hi again" através do |gene|, propagando todas as combinações possíveis com as probabilidades corretas.
 
      \item \textbf{Passo 3: cauda ["bye"]}  
-     \begin{center}
      \begin{spec}
      pcataList gene ["bye"] = do
         y2 <- pcataList gene [];
         gene (Right ("bye", y2))
      \end{spec}
-     \end{center}
     Cada resultado $y_2$ do caso base é combinado com "bye" através do |gene|, multiplicando as probabilidades de cada etapa.
 
      \item \textbf{Passo 4: caso base []}  
-     \begin{center}
      \begin{spec}
      pcataList gene [] = gene (Left ())
      \end{spec}
-     \end{center}
     Produz a distribuição inicial que representa as possíveis terminações da mensagem, de acordo com o comportamento probabilístico do |gene|.
 \end{itemize}
 
 A partir deste caso base, o catamorfismo combina sucessivamente cada palavra com todos os resultados possíveis da sua cauda, multiplicando as probabilidades locais. Deste modo, o valor
 
-\begin{center}
 \begin{spec}
 pcataList gene ["hi","hi again","bye"]
 \end{spec}
-\end{center}
 
 corresponde a uma única distribuição final que contém todas as mensagens possíveis resultantes da transmissão, já com as probabilidades corretamente combinadas.
 
@@ -1489,14 +1488,11 @@ Depois de analisados os três componentes principais desta solução — o móna
 
 Assim, fica-se com:
 
-
-\begin{center}
 \begin{code}
 gene :: Either () (String, [String]) -> Dist [String]
 gene (Left ()) = D [(["stop"], 0.9), ([], 0.1)]
 gene (Right (x, ys)) = D [(x:ys, 0.95), (ys, 0.05)]
 \end{code}
-\end{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1539,9 +1535,68 @@ Assim, observando os resultados obtidos, é possível responder às questões pr
      \textbf {É de 77.2\%.}
 \end{itemize}
 
+\textbf{Verificação das soluções}
+
+Tal como feito em alguns dos problemas anteriores, decidimos que seria interessante testar os resultados a que chegamos neste problema também. Para isto, aplicando conhecimento de Elementos de Probabilidades adquiridos ao longo do curso, fizemos:
+
+Tendo em conta as probabilidades dadas no enunciado do problema:
+\begin{itemize}
+     \item Seja $P(w)$ a probabilidade da palavra $w$ ser transmitida, com $P(w)=0.95$. 
+     \item Seja P(não transmitir "stop") a probabilidade de não transmitir "stop" no fim da mensagem, com P(não transmitir "stop") = $0.1$
+
+     E sabendo que:
+     \item A probabilidade $P(m)$ é a probabilidade da mensagem transmitida ser $m$.
+\end{itemize}
+
+Pode-se calcular as probabilidades dos casos pedidos:
+
+\begin{itemize}
+     \item \textbf{1-} Qual a probabilidade da palavra "atacar" da mensagem se perder? 
+
+     Sabendo que a mensagem transmitida neste caso seria:
+
+     m1 = ["Vamos","hoje","stop"]
+     \begin{align*}
+     P(m1) &= P(\text{``Vamos''}) 
+          \times (1 - P(\text{``atacar''})) 
+          \times P(\text{``hoje''}) 
+          \times (1 - P(\text{não transmitir ``stop''})) \\
+          &= 0.95 \times 0.05 \times 0.95 \times 0.9 \\
+          &= 0.0406125 \approx 0.041 = 4.1\%
+     \end{align*}
 
 
+     \item \textbf{2-} Qual a probabilidade de seguirem todas as palavras, mas faltar o "stop"?
 
+     Sendo a mensagem transmitida: 
+
+     m2 = ["Vamos","atacar","hoje"]
+     \begin{align*}
+     P(m2) &= P(\text{``Vamos''}) 
+          \times P(\text{``atacar''}) 
+          \times P(\text{``hoje''}) 
+          \times P(\text{não transmitir ``stop''}) \\
+          &= 0.95 \times 0.95 \times 0.95 \times 0.1 \\
+          &= 0.0857375 \approx 0.086 = 8.6\%
+     \end{align*}
+
+
+     \item \textbf{3-} Qual a probabilidade da transmissão ser perfeita?
+
+     Neste caso, a mensagem transmitida seria:
+
+     m3 = ["Vamos","atacar","hoje","stop"]
+     \begin{align*}
+     P(m3) &= P(\text{``Vamos''}) 
+          \times P(\text{``atacar''}) 
+          \times P(\text{``hoje''}) 
+          \times (1 - P(\text{não transmitir ``stop''})) \\
+          &= 0.95 \times 0.95 \times 0.95 \times 0.9 \\
+          &= 0.7716375 \approx 0.772 = 77.2\%
+     \end{align*}
+\end{itemize}
+
+Logo, por comparação dos resultados obtidos a partir do interpretador e das soluções calculadas, pode-se concluir que as funções usadas funcionam de acordo com o desejado.
 
 
 

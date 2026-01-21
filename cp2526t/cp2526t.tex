@@ -1674,7 +1674,7 @@ Pretende-se que a função \ensuremath{\Varid{transmitir}} modele corretamente e
 
 O comportamento local do aparelho é descrito por um \ensuremath{\Varid{gene}}, que define as decisões probabilísticas a tomar em cada passo da transmissão. A função \ensuremath{\Varid{transmitir}\mathrel{=}\Varid{pcataList}\;\Varid{gene}} separa, assim, o mecanismo genérico de percorrer a lista, do comportamento específico do aparelho.
 
-Antes de apresentar a solução completa, achamos útil analisar cada componente que será usado para que, de seguida, a definição do gene seja mais intuitiva de deduzir e possa ser aplicada para verificar a solução para o problema proposto.
+Antes de apresentar a solução completa, achamos útil analisar cada componente que será usado para que, de seguida, a solução para o problema proposto seja mais fácil de perceber.
 
 \textbf{Uso de Dist}
 
@@ -1682,14 +1682,12 @@ Para este problema, é necessário modelar a transmissão de mensagens, em que c
 
 O mónade Dist faz exatamente isso:
 
-\begin{center}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\mathbf{newtype}\;\fun{Dist}\;\Varid{a}\mathrel{=}\Conid{D}\;\{\mskip1.5mu \Varid{unD}\mathbin{::}[\mskip1.5mu (\Varid{a},\Conid{ProbRep})\mskip1.5mu]\mskip1.5mu\}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-\end{center}
 
 \begin{itemize}
      \item Cada \ensuremath{\Varid{a}} é um possível valor (no caso, uma mensagem ou palavra transmitida).
@@ -1698,28 +1696,20 @@ O mónade Dist faz exatamente isso:
 
 Dist forma um mónade porque:
 
-\begin{center}
 \begin{itemize}
      \item Tem uma operação return: \ensuremath{\Varid{return}\;\Varid{a}\mathrel{=}\Conid{D}\;[\mskip1.5mu (\Varid{a},\mathrm{1})\mskip1.5mu]}, que gera uma distribuição determinística com probabilidade 1.  
      \item Tem uma composição de Kleisli (bind >>=): 
-     \begin{center}
      $(f \bullet g)~a = [(y,q*p) \mid (x,p) \leftarrow g~a, (y,q) \leftarrow f~x]$,  
-     \end{center}
      onde 
      
-     \begin{center}
      $g :: A \to \texttt{Dist B}$ 
-     \end{center}
 
      e 
 
-     \begin{center}
      $f :: B \to \texttt{Dist C}$ 
-     \end{center}
     
      são funções que representam computações probabilísticas.  
 \end{itemize}
-\end{center}
 
 Esta definição permite combinar automaticamente as probabilidades de múltiplas etapas de cálculo.
 Por exemplo, ao percorrer uma lista de palavras, o mónade Dist calcula todas as combinações
@@ -1739,16 +1729,14 @@ O \ensuremath{\Varid{gene}} deverá descrever o comportamento local do aparelho 
 
 Pode-se afirmar que o tipo do \ensuremath{\Varid{gene}} é:
 
-\begin{center}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{gene}\mathbin{::}()+(\Conid{String},[\mskip1.5mu \Conid{String}\mskip1.5mu])\to \fun{Dist}\;[\mskip1.5mu \Conid{String}\mskip1.5mu]{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-\end{center}
 
-Já que o uso do \ensuremath{\cdot +\cdot } permite separar de forma natural os dois casos distintos que surgem ao percorrer uma lista:
+já que o uso do \ensuremath{\cdot +\cdot } permite separar de forma natural os dois casos distintos que surgem ao percorrer uma lista:
 
 \begin{itemize}
     \item \textbf{Lista vazia:} representada por \ensuremath{i_1\;()}. Este caso corresponde ao fim da lista, permitindo decidir probabilisticamente se a transmissão termina corretamente ou se ocorre a falha de envio de "stop". 
@@ -1765,18 +1753,35 @@ Desta forma, o \ensuremath{\Varid{gene}} consegue tratar de forma modular e unif
 
 O catamorfismo \ensuremath{\Varid{pcataList}} percorre a lista de palavras de forma recursiva, aplicando a função \ensuremath{\Varid{gene}} a cada passo. Esta abordagem permite separar a lógica de percorrer a lista, da lógica de transmissão probabilística, tornando o comportamento do aparelho mais fácil de modelar. Sabendo a declaração de \ensuremath{\Varid{pcataList}} (dada no enunciado):
 
-\begin{center}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{pcataList}\mathbin{::}(()+(\Varid{a},\Varid{b})\to \fun{Dist}\;\Varid{b})\to [\mskip1.5mu \Varid{a}\mskip1.5mu]\to \fun{Dist}\;\Varid{b}{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-\end{center}
 
-E que em listas, os catamorfismos devem ter em conta os casos de lista vazia e não vazia, é possível deduzir a definição de \ensuremath{\Varid{pcataList}} como sendo:
+E embora a sua definição de não seja dada explicitamente, o seu comportamento pode ser compreendido observando a analogia direta com o catamorfismo determinístico \ensuremath{\llparenthesis\, \cdot \,\rrparenthesis}.
 
-\begin{center}
+Como: 
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[B]{}\llparenthesis\, \Varid{g}\,\rrparenthesis\mathrel{=}\Varid{g}\comp \Varid{recList}\;\llparenthesis\, \Varid{g}\,\rrparenthesis\comp \Varid{outList}{}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+\ensuremath{\Varid{outList}} desconstrói a lista (vazia ou cabeça+cauda) e \ensuremath{\Varid{recList}} aplica recursivamente o catamorfismo à cauda. No caso determinístico, cada passo devolve apenas um valor, que é então combinado por \ensuremath{\Varid{g}}.
+
+No caso probabilístico, \ensuremath{\Varid{pcataList}} funciona de forma análoga, mas cada chamada recursiva produz uma distribuição de resultados, em vez de um único valor. Assim:
+
+\begin{itemize}
+     \item Caso base: a lista é vazia, não há valores intermédios a combinar, e o resultado é obtido aplicando diretamente o \ensuremath{\Varid{gene}} a \texttt{Left ()}.
+     \item Caso recursivo: a chamada \ensuremath{\Varid{pcataList}\;\Varid{gene}\;\Varid{xs}} devolve uma distribuição de resultados da cauda. Cada valor desta distribuição deve ser processado pelo \ensuremath{\Varid{gene}} novamente, combinando as probabilidades corretamente.
+\end{itemize}
+
+Esta combinação de resultados intermédios segue exatamente o padrão de composição monádica, pelo que é necessário usar a operação \ensuremath{\bind } do mónade \ensuremath{\fun{Dist}}. O \ensuremath{\Varid{bind}} permite propagar automaticamente as probabilidades de cada passo, replicando o comportamento de \ensuremath{\llparenthesis\, \cdot \,\rrparenthesis} num contexto probabilístico. Aplicando este raciocínio ao caso base e ao caso recursivo, obtemos a definição de \ensuremath{\Varid{pcataList}}:
+
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{5}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1794,25 +1799,38 @@ E que em listas, os catamorfismos devem ter em conta os casos de lista vazia e n
 \>[5]{}\Varid{gene}\;(i_2\;(\Varid{x},\Varid{y})){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-\end{center}
 
-Nesta definição:
+Que pode ser expandida removendo a notação 'do' e usando o operador \ensuremath{\Varid{bind}} diretamente:
+
+\begin{hscode}\SaveRestoreHook
+\column{B}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{6}{@{}>{\hspre}l<{\hspost}@{}}%
+\column{E}{@{}>{\hspre}l<{\hspost}@{}}%
+\>[6]{}\Varid{pcataList}\;\Varid{gene}\;[\mskip1.5mu \mskip1.5mu]\mathrel{=}\Varid{gene}\;(i_1\;()){}\<[E]%
+\\
+\>[6]{}\Varid{pcataList}\;\Varid{gene}\;(\Varid{x}\mathbin{:}\Varid{xs})\mathrel{=}{}\<[E]%
+\\
+\>[6]{}\Varid{pcataList}\;\Varid{gene}\;\Varid{xs}\bind \lambda \Varid{y}\to {}\<[E]%
+\\
+\>[6]{}\Varid{gene}\;(i_2\;(\Varid{x},\Varid{y})){}\<[E]%
+\ColumnHook
+\end{hscode}\resethooks
+
+Em ambas as definições:
 
 \begin{itemize}
     \item No caso da lista ser vazia, \ensuremath{\Varid{gene}} recebe \ensuremath{i_1\;()}, permitindo decidir probabilisticamente se o processo termina.
-    \item No caso da lista não ser vazia, a cauda da lista é processada primeiro recursivamente, produzindo $y$, que é então combinado com a cabeça $x$ através de \ensuremath{\Varid{gene}\;(i_2\;(\Varid{x},\Varid{y}))}.
+    \item No caso da lista não ser vazia, a cauda da lista é processada primeiro de forma recursiva, produzindo $y$, que representa todas as distribuições intermédias da cauda. Cada um desses resultados é então combinado com a cabeça $x$ através de \ensuremath{\Varid{gene}\;(i_2\;(\Varid{x},\Varid{y}))}, propagando corretamente as probabilidades de cada passo.
 \end{itemize}
 
 Para ilustrar o seu funcionamento, considere a mensagem:
-\begin{center}
+
 ["hi","hi again","bye"]
-\end{center}
 
 A aplicação de \ensuremath{\Varid{pcataList}\;\Varid{gene}} a esta lista é definida recursivamente, seguindo a estrutura do catamorfismo sobre listas. Os passos da execução, são:
 
 \begin{itemize}
      \item \textbf{Passo 1: lista completa ["hi","hi again","bye"]}  
-     \begin{center}
      \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{6}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1827,11 +1845,9 @@ A aplicação de \ensuremath{\Varid{pcataList}\;\Varid{gene}} a esta lista é de
 \>[9]{}\Varid{gene}\;(i_2\;(\text{\ttfamily \char34 hi\char34},\Varid{y})){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-     \end{center}
     O valor $y$ representa uma distribuição de todos os resultados possíveis da cauda ["hi again","bye"].
 
      \item \textbf{Passo 2: cauda ["hi again","bye"]}  
-     \begin{center}
      \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{6}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1846,11 +1862,9 @@ A aplicação de \ensuremath{\Varid{pcataList}\;\Varid{gene}} a esta lista é de
 \>[9]{}\Varid{gene}\;(i_2\;(\text{\ttfamily \char34 hi~again\char34},\Varid{y1})){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-     \end{center}
     Cada resultado $y_1$ da chamada à cauda anterior é combinado com "hi again" através do \ensuremath{\Varid{gene}}, propagando todas as combinações possíveis com as probabilidades corretas.
 
      \item \textbf{Passo 3: cauda ["bye"]}  
-     \begin{center}
      \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{6}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1865,11 +1879,9 @@ A aplicação de \ensuremath{\Varid{pcataList}\;\Varid{gene}} a esta lista é de
 \>[9]{}\Varid{gene}\;(i_2\;(\text{\ttfamily \char34 bye\char34},\Varid{y2})){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-     \end{center}
     Cada resultado $y_2$ do caso base é combinado com "bye" através do \ensuremath{\Varid{gene}}, multiplicando as probabilidades de cada etapa.
 
      \item \textbf{Passo 4: caso base []}  
-     \begin{center}
      \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{6}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1877,20 +1889,17 @@ A aplicação de \ensuremath{\Varid{pcataList}\;\Varid{gene}} a esta lista é de
 \>[6]{}\Varid{pcataList}\;\Varid{gene}\;[\mskip1.5mu \mskip1.5mu]\mathrel{=}\Varid{gene}\;(i_1\;()){}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-     \end{center}
     Produz a distribuição inicial que representa as possíveis terminações da mensagem, de acordo com o comportamento probabilístico do \ensuremath{\Varid{gene}}.
 \end{itemize}
 
 A partir deste caso base, o catamorfismo combina sucessivamente cada palavra com todos os resultados possíveis da sua cauda, multiplicando as probabilidades locais. Deste modo, o valor
 
-\begin{center}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
 \>[B]{}\Varid{pcataList}\;\Varid{gene}\;[\mskip1.5mu \text{\ttfamily \char34 hi\char34},\text{\ttfamily \char34 hi~again\char34},\text{\ttfamily \char34 bye\char34}\mskip1.5mu]{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-\end{center}
 
 corresponde a uma única distribuição final que contém todas as mensagens possíveis resultantes da transmissão, já com as probabilidades corretamente combinadas.
 
@@ -1911,8 +1920,6 @@ Depois de analisados os três componentes principais desta solução — o móna
 
 Assim, fica-se com:
 
-
-\begin{center}
 \begin{hscode}\SaveRestoreHook
 \column{B}{@{}>{\hspre}l<{\hspost}@{}}%
 \column{E}{@{}>{\hspre}l<{\hspost}@{}}%
@@ -1923,7 +1930,6 @@ Assim, fica-se com:
 \>[B]{}\Varid{gene}\;(i_2\;(\Varid{x},\Varid{ys}))\mathrel{=}\Conid{D}\;[\mskip1.5mu (\Varid{x}\mathbin{:}\Varid{ys},\mathrm{0.95}),(\Varid{ys},\mathrm{0.05})\mskip1.5mu]{}\<[E]%
 \ColumnHook
 \end{hscode}\resethooks
-\end{center}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1966,9 +1972,68 @@ Assim, observando os resultados obtidos, é possível responder às questões pr
      \textbf {É de 77.2\%.}
 \end{itemize}
 
+\textbf{Verificação das soluções}
+
+Tal como feito em alguns dos problemas anteriores, decidimos que seria interessante testar os resultados a que chegamos neste problema também. Para isto, aplicando conhecimento de Elementos de Probabilidades adquiridos ao longo do curso, fizemos:
+
+Tendo em conta as probabilidades dadas no enunciado do problema:
+\begin{itemize}
+     \item Seja $P(w)$ a probabilidade da palavra $w$ ser transmitida, com $P(w)=0.95$. 
+     \item Seja P(não transmitir "stop") a probabilidade de não transmitir "stop" no fim da mensagem, com P(não transmitir "stop") = $0.1$
+
+     E sabendo que:
+     \item A probabilidade $P(m)$ é a probabilidade da mensagem transmitida ser $m$.
+\end{itemize}
+
+Pode-se calcular as probabilidades dos casos pedidos:
+
+\begin{itemize}
+     \item \textbf{1-} Qual a probabilidade da palavra "atacar" da mensagem se perder? 
+
+     Sabendo que a mensagem transmitida neste caso seria:
+
+     m1 = ["Vamos","hoje","stop"]
+     \begin{align*}
+     P(m1) &= P(\text{``Vamos''}) 
+          \times (1 - P(\text{``atacar''})) 
+          \times P(\text{``hoje''}) 
+          \times (1 - P(\text{não transmitir ``stop''})) \\
+          &= 0.95 \times 0.05 \times 0.95 \times 0.9 \\
+          &= 0.0406125 \approx 0.041 = 4.1\%
+     \end{align*}
 
 
+     \item \textbf{2-} Qual a probabilidade de seguirem todas as palavras, mas faltar o "stop"?
 
+     Sendo a mensagem transmitida: 
+
+     m2 = ["Vamos","atacar","hoje"]
+     \begin{align*}
+     P(m2) &= P(\text{``Vamos''}) 
+          \times P(\text{``atacar''}) 
+          \times P(\text{``hoje''}) 
+          \times P(\text{não transmitir ``stop''}) \\
+          &= 0.95 \times 0.95 \times 0.95 \times 0.1 \\
+          &= 0.0857375 \approx 0.086 = 8.6\%
+     \end{align*}
+
+
+     \item \textbf{3-} Qual a probabilidade da transmissão ser perfeita?
+
+     Neste caso, a mensagem transmitida seria:
+
+     m3 = ["Vamos","atacar","hoje","stop"]
+     \begin{align*}
+     P(m3) &= P(\text{``Vamos''}) 
+          \times P(\text{``atacar''}) 
+          \times P(\text{``hoje''}) 
+          \times (1 - P(\text{não transmitir ``stop''})) \\
+          &= 0.95 \times 0.95 \times 0.95 \times 0.9 \\
+          &= 0.7716375 \approx 0.772 = 77.2\%
+     \end{align*}
+\end{itemize}
+
+Logo, por comparação dos resultados obtidos a partir do interpretador e das soluções calculadas, pode-se concluir que as funções usadas funcionam de acordo com o desejado.
 
 
 
