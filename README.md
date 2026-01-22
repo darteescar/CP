@@ -58,7 +58,7 @@ ghci cp2526t.lhs
 Solving **functional programming** problems using **Calculus of Programs** techniques, in the scope of the **CP** course.
 The project follows a [**literate programming**](http://www.literateprogramming.com/) approach, where code and documentation coexist in the same file.
 
-Both the statement and solutions are in Portuguese in the [final report](/CP/cp2526t/cp2526t.pdf).
+Both the statement and solutions are in Portuguese in the [final report](cp2526t/cp2526t.pdf).
 
 ## Group Members
 * [darteescar](https://github.com/darteescar)
