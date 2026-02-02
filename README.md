@@ -10,8 +10,6 @@ Tanto o enunciado como as soluções encontram-se em Português no [relatório f
 * [luis7788](https://github.com/luis7788)
 * [tiagofigueiredo7](https://github.com/tiagofigueiredo7)
 
-### Nota Final: ?? / 20 ⭐️
-
 ## Dependências
 
 Para compilar e executar os programas, é necessário ter instalado:
@@ -64,8 +62,6 @@ Both the statement and solutions are in Portuguese in the [final report](cp2526t
 * [darteescar](https://github.com/darteescar)
 * [luis7788](https://github.com/luis7788)
 * [tiagofigueiredo7](https://github.com/tiagofigueiredo7)
-
-### Final Grade: ?? / 20 ⭐️
 
 ## Dependencies
 To compile and run the programs, you need to have installed:
