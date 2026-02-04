@@ -1,7 +1,7 @@
 # CP (Cálculo de Programas) (Português)
 
 Resolução de problemas de **programação funcional** utilizando técnicas de **Cálculo de Programas**, no âmbito da unidade curricular de **CP**.  
-O trabalho segue uma abordagem de [**programação literária**](http://www.literateprogramming.com/), onde código e documentação coexistem no mesmo ficheiro.
+O trabalho segue uma abordagem de [**programação literária**](http://www.literateprogramming.com/), onde código e documentação coexistem no mesmo ficheiro
 
 Tanto o enunciado como as soluções encontram-se em Português no [relatório final](cp2526t/cp2526t.pdf).
 
